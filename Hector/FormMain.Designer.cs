@@ -29,6 +29,9 @@ namespace Hector
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Tous les articles");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Familles");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Marques");
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fichiersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,27 +72,27 @@ namespace Hector
             // importerToolStripMenuItem
             // 
             this.importerToolStripMenuItem.Name = "importerToolStripMenuItem";
-            this.importerToolStripMenuItem.Size = new System.Drawing.Size(149, 26);
+            this.importerToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
             this.importerToolStripMenuItem.Text = "Importer";
             // 
             // exporterToolStripMenuItem
             // 
             this.exporterToolStripMenuItem.Name = "exporterToolStripMenuItem";
-            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(149, 26);
+            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
             this.exporterToolStripMenuItem.Text = "Exporter";
             // 
             // actualiserToolStripMenuItem
             // 
             this.actualiserToolStripMenuItem.Name = "actualiserToolStripMenuItem";
-            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(149, 26);
+            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
             this.actualiserToolStripMenuItem.Text = "Actualiser";
             // 
             // statusStrip1
             // 
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusStrip1.Location = new System.Drawing.Point(0, 426);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(800, 24);
+            this.statusStrip1.Size = new System.Drawing.Size(800, 22);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -107,7 +110,7 @@ namespace Hector
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.listView1);
-            this.splitContainer1.Size = new System.Drawing.Size(800, 398);
+            this.splitContainer1.Size = new System.Drawing.Size(800, 400);
             this.splitContainer1.SplitterDistance = 266;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -118,7 +121,17 @@ namespace Hector
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView1.Location = new System.Drawing.Point(3, 3);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(260, 394);
+            treeNode1.Name = "TousArticles";
+            treeNode1.Text = "Tous les articles";
+            treeNode2.Name = "Familles";
+            treeNode2.Text = "Familles";
+            treeNode3.Name = "Marques";
+            treeNode3.Text = "Marques";
+            this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3});
+            this.treeView1.Size = new System.Drawing.Size(260, 396);
             this.treeView1.TabIndex = 0;
             // 
             // listView1
@@ -129,7 +142,7 @@ namespace Hector
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(-1, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(528, 397);
+            this.listView1.Size = new System.Drawing.Size(528, 399);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
