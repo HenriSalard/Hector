@@ -10,22 +10,16 @@ using System.Windows.Forms;
 
 namespace Hector
 {
-    public partial class FormMain : Form
+    public partial class FormExport : Form
     {
-        public FormMain()
+        public FormExport()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void FormExport_Load(object sender, EventArgs e)
         {
 
-        }
-
-        private void exporterToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FormExport formexport = new FormExport();
-            formexport.ShowDialog();
         }
     }
 }

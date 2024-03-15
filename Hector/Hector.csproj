@@ -64,6 +64,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormExport.Designer.cs">
+      <DependentUpon>FormExport.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modele\Famille.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
@@ -75,6 +81,9 @@
     <Compile Include="Modele\SousFamille.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormExport.resx">
+      <DependentUpon>FormExport.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
