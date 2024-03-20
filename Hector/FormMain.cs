@@ -45,6 +45,25 @@ namespace Hector
         {
 
         }
+
+        private void exporterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormExport Exportdialog = new FormExport();
+
+            if (Exportdialog.ShowDialog(this) == DialogResult.OK)
+            {
+
+            }
+            else
+            {
+
+            }
+
+            // Suppression de la fenetre Importer
+
+            Exportdialog.Dispose();
+
+        }
     }
 
 
