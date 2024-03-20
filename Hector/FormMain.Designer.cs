@@ -69,19 +69,20 @@ namespace Hector
             // importerToolStripMenuItem
             // 
             this.importerToolStripMenuItem.Name = "importerToolStripMenuItem";
-            this.importerToolStripMenuItem.Size = new System.Drawing.Size(157, 26);
+            this.importerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.importerToolStripMenuItem.Text = "Importer";
+            this.importerToolStripMenuItem.Click += new System.EventHandler(this.importerToolStripMenuItem_Click);
             // 
             // exporterToolStripMenuItem
             // 
             this.exporterToolStripMenuItem.Name = "exporterToolStripMenuItem";
-            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(157, 26);
+            this.exporterToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.exporterToolStripMenuItem.Text = "Exporter";
             // 
             // actualiserToolStripMenuItem
             // 
             this.actualiserToolStripMenuItem.Name = "actualiserToolStripMenuItem";
-            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(157, 26);
+            this.actualiserToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.actualiserToolStripMenuItem.Text = "Actualiser";
             // 
             // statusStrip1
@@ -144,7 +145,6 @@ namespace Hector
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormMain";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);

@@ -14,10 +14,30 @@ namespace Hector
         public FormMain()
         {
             InitializeComponent();
+            this.Text = "Fenetre principale";
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void importerToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Creation de la fenetre Importer
+
+            FormImport ImportDialog = new FormImport();
+
+            // Affichage de la fenetre Importer
+
+            
+            if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                
+            }
+            else
+            {
+            }
+
+            // Suppression de la fenetre Importer
+
+            ImportDialog.Dispose();
+
 
         }
     }
