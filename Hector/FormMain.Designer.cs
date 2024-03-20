@@ -65,6 +65,7 @@ namespace Hector
             this.fichiersToolStripMenuItem.Name = "fichiersToolStripMenuItem";
             this.fichiersToolStripMenuItem.Size = new System.Drawing.Size(72, 24);
             this.fichiersToolStripMenuItem.Text = "Fichiers";
+            this.fichiersToolStripMenuItem.Click += new System.EventHandler(this.fichiersToolStripMenuItem_Click);
             // 
             // importerToolStripMenuItem
             // 

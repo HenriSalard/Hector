@@ -40,5 +40,14 @@ namespace Hector
 
 
         }
+
+        private void fichiersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
+
+
+
 }
+

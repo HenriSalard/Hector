@@ -22,13 +22,13 @@ namespace Hector
             this.LabelFileName.Text = "";
 
 
-
-
         }
 
         private void FormImport_Load(object sender, EventArgs e)
         {
-
+            // On cache les boutons tant qu'aucun fichier n'est selectionné
+            this.ButtonEcrasement.Visible = false;
+            this.ButtonAjout.Visible = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -53,6 +53,9 @@ namespace Hector
 
                     LabelFileName.Text = Path.GetFileName(FilePath);
 
+                    ButtonAjout.Visible = true;
+                    ButtonEcrasement.Visible = true;
+
                     using (StreamReader reader = new StreamReader(fileStream))
                     {
                     }
@@ -60,7 +63,12 @@ namespace Hector
             }
             }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void ButtonEcrasement_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ButtonAjout_Click(object sender, EventArgs e)
         {
 
         }
