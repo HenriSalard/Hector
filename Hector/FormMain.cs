@@ -66,6 +66,11 @@ namespace Hector
 
         }
 
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+
+        }
+
         protected void RefreshTree(string sqlpath)
         {
             
@@ -97,6 +102,8 @@ namespace Hector
 
         }
     }
+
+    
 
 
 
