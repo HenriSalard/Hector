@@ -33,6 +33,7 @@ namespace Hector
             this.LabelFileName = new System.Windows.Forms.Label();
             this.ButtonEcrasement = new System.Windows.Forms.Button();
             this.ButtonAjout = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // button1
@@ -53,6 +54,7 @@ namespace Hector
             this.LabelFileName.Size = new System.Drawing.Size(124, 17);
             this.LabelFileName.TabIndex = 1;
             this.LabelFileName.Text = "Nom du fichier csv";
+            this.LabelFileName.Click += new System.EventHandler(this.LabelFileName_Click);
             // 
             // ButtonEcrasement
             // 
@@ -74,11 +76,19 @@ namespace Hector
             this.ButtonAjout.UseVisualStyleBackColor = true;
             this.ButtonAjout.Click += new System.EventHandler(this.ButtonAjout_Click);
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(96, 262);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(188, 23);
+            this.progressBar1.TabIndex = 4;
+            // 
             // FormImport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(382, 353);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.ButtonAjout);
             this.Controls.Add(this.ButtonEcrasement);
             this.Controls.Add(this.LabelFileName);
@@ -98,5 +108,6 @@ namespace Hector
         private System.Windows.Forms.Label LabelFileName;
         private System.Windows.Forms.Button ButtonEcrasement;
         private System.Windows.Forms.Button ButtonAjout;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }

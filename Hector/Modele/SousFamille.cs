@@ -8,11 +8,6 @@ namespace Hector.Modele
 {
     class SousFamille
     {
-        private int refSousFamille;
-
-        private int refFamille;
-
-        private string nomSousFamille;
 
         public SousFamille(int refSousFamille, int refFamille, string nomSousFamille)
         {
@@ -21,10 +16,10 @@ namespace Hector.Modele
             this.NomSousFamille = nomSousFamille;
         }
 
-        public int RefSousFamille { get => refSousFamille; set => refSousFamille = value; }
+        public int RefSousFamille { get; set; }
 
-        public int RefFamille { get => refFamille; set => refFamille = value; }
+        public int RefFamille { get; set; }
 
-        public string NomSousFamille { get => nomSousFamille; set => nomSousFamille = value; }
+        public string NomSousFamille { get; set; }
     }
 }

@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modele\Article.cs" />
     <Compile Include="Modele\Famille.cs" />
     <Compile Include="FormExport.cs">
       <SubType>Form</SubType>
@@ -83,6 +84,7 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modele\FonctionsSQLite.cs" />
     <Compile Include="Modele\Marque.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
