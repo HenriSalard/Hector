@@ -8,9 +8,6 @@ namespace Hector
 {
     class Famille
     {
-        private int refFamille;
-
-        private string nomFamille;
 
         public Famille(int refFamille, string nomFamille)
         {
@@ -18,8 +15,9 @@ namespace Hector
             this.NomFamille = nomFamille;
         }
 
-        public string NomFamille { get => nomFamille; set => nomFamille = value; }
+        
 
-        public int RefFamille { get => refFamille; set => refFamille = value; }
+        public int RefFamille { get; protected set; }
+        public string NomFamille { get; protected set; }
     }
 }

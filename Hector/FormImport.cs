@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -12,6 +13,9 @@ namespace Hector
 {
     public partial class FormImport : Form
     {
+
+        private string FilePath;
+
         public FormImport()
         {
             InitializeComponent();
@@ -20,6 +24,7 @@ namespace Hector
             // On initialise le texte du nom du fichier à vide 
 
             this.LabelFileName.Text = "";
+            this.FilePath = string.Empty;
 
 
         }
@@ -29,12 +34,12 @@ namespace Hector
             // On cache les boutons tant qu'aucun fichier n'est selectionné
             this.ButtonEcrasement.Visible = false;
             this.ButtonAjout.Visible = false;
+            this.progressBar1.Visible = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             var FileContent = string.Empty;
-            var FilePath = string.Empty;
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -45,20 +50,12 @@ namespace Hector
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    //Get the path of specified file
-                    FilePath = openFileDialog.FileName;
+                    this.FilePath = openFileDialog.FileName;
 
-                    //Read the contents of the file into a stream
-                    var fileStream = openFileDialog.OpenFile();
-
-                    LabelFileName.Text = Path.GetFileName(FilePath);
+                    LabelFileName.Text = Path.GetFileName(this.FilePath);
 
                     ButtonAjout.Visible = true;
                     ButtonEcrasement.Visible = true;
-
-                    using (StreamReader reader = new StreamReader(fileStream))
-                    {
-                    }
                 }
             }
             }
@@ -69,6 +66,16 @@ namespace Hector
         }
 
         private void ButtonAjout_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CSVParser(string FilePath)
+        {
+
+        }
+
+        private void LabelFileName_Click(object sender, EventArgs e)
         {
 
         }
