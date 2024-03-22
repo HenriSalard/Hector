@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hector.Modele;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -62,12 +63,22 @@ namespace Hector
 
         private void ButtonEcrasement_Click(object sender, EventArgs e)
         {
+            SQLiteConnection con = new SQLiteConnection("Hector.sqlite");
+            List<Marque> AnciennesMarques = FonctionsSQLite.SQLiteRecupererMarques(con);
+            for (Marque marque in AnciennesMarques)
+            {
 
+            }
+
+
+            //Recuperer les id des marques
+            //Verifier si certaines des marques sont déjà dans notre base
+            //Update database
         }
 
         private void ButtonAjout_Click(object sender, EventArgs e)
         {
-
+            SQLiteConnection con = new SQLiteConnection(this.FilePath);
         }
 
         private void CSVParser(string FilePath)
