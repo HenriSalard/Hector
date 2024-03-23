@@ -31,14 +31,15 @@ namespace Hector
             this.FilePath = string.Empty;
             this.ArticleAjoutes = 0;
             this.NbAnomaliesRefArticles = 0;
+            this.progressBar1.Minimum = 1;
+            this.progressBar1.Maximum = 11;
         }
 
         private void FormImport_Load(object sender, EventArgs e)
         {
             // On cache les boutons tant qu'aucun fichier n'est selectionné
-            this.ButtonEcrasement.Visible = false;
-            this.ButtonAjout.Visible = false;
-            this.progressBar1.Visible = false;
+            this.ButtonEcrasement.Enabled = false;
+            this.ButtonAjout.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -58,8 +59,8 @@ namespace Hector
 
                     LabelFileName.Text = Path.GetFileName(this.FilePath);
 
-                    ButtonAjout.Visible = true;
-                    ButtonEcrasement.Visible = true;
+                    ButtonAjout.Enabled = true;
+                    ButtonEcrasement.Enabled = true;
                 }
             }
             }
@@ -73,7 +74,63 @@ namespace Hector
 
             Con.Open();
 
-            // On vide chaque tabel de la base de donnees
+            progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
+
+            // Ouverture du fichier csv
+            StreamReader Reader = File.OpenText(FilePath);
+
+            // Creation des listes qui vont contenir les donnees du tableur csv
+            List<string> ListeDescriptions = new List<string>();
+            List<string> ListeRefs = new List<string>();
+            List<string> ListeMarques = new List<string>();
+            List<string> ListeFamilles = new List<string>();
+            List<string> ListeSousFamilles = new List<string>();
+            List<float> ListePrix = new List<float>();
+
+            // Recuperation des donnees du csv
+
+            var Ligne = Reader.ReadLine(); // Il faut sauter la premiere ligne
+            while (!Reader.EndOfStream)
+            {
+                Ligne = Reader.ReadLine();
+                var Valeurs = Ligne.Split(';');
+                ListeDescriptions.Add(Valeurs[0]);
+                ListeRefs.Add(Valeurs[1]);
+                ListeMarques.Add(Valeurs[2]);
+                ListeFamilles.Add(Valeurs[3]);
+                ListeSousFamilles.Add(Valeurs[4]);
+                ListePrix.Add(float.Parse(Valeurs[5]));
+            }
+
+            progressBar1.PerformStep();
+
+            // Dans la partie suivante, on va creer les listes contenant les lignes de notre base de données
+            // Chaque methode utilisee peut etre retrouvee a la suite des methodes des deux bouton d'import de la classe actuelle
+
+            List<Marque> AnciennesMarques = new List<Marque>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
+            List<Marque> ListeNouvellesMarques = TrouverNouvellesMarques(ListeMarques, AnciennesMarques);
+
+            progressBar1.PerformStep();
+
+            List<Famille> ListeAnciennesFamilles = new List<Famille>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
+            List<Famille> ListeNouvellesFamilles = TrouverNouvellesFamilles(ListeFamilles, ListeAnciennesFamilles);
+
+            progressBar1.PerformStep();
+
+            List<SousFamille> ListeAnciennesSousFamilles = new List<SousFamille>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
+            List<SousFamille> ListeNouvellesSousFamilles = TrouverNouvellesSousFamilles(ListeSousFamilles, ListeAnciennesSousFamilles, ListeNouvellesFamilles, ListeFamilles);
+
+            progressBar1.PerformStep();
+
+            List<Article> ListeAncienArticles = new List<Article>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
+
+            // On cree la nouvelle liste d'article grace a toutes les listes qu'on a cree avant
+            List<Article> ListeNouveauxArticles = TrouverNouveauxArticles(ListeDescriptions, ListeRefs, ListeMarques, ListeSousFamilles, ListePrix,
+                ListeAncienArticles, ListeNouvellesMarques, ListeNouvellesSousFamilles);
+
+            progressBar1.PerformStep();
+
+            // On vide chaque table de la base de donnees
 
             SQLiteCommand CommandeDelete = new SQLiteCommand("DELETE FROM SousFamilles", Con);
             CommandeDelete.ExecuteNonQuery();
@@ -87,49 +144,7 @@ namespace Hector
             CommandeDelete.CommandText = "DELETE  FROM Articles";
             CommandeDelete.ExecuteNonQuery();
 
-            // Ouverture du fichier csv
-            StreamReader Reader = File.OpenText(FilePath);
-
-            // Creation des listes qui vont contenir les donnees du tableur csv
-            List<string> ListeDescriptions = new List<string>();
-            List<string> ListeRefs = new List<string>();
-            List<string> ListeMarques = new List<string>();
-            List<string> ListeFamilles = new List<string>();
-            List<string> ListeSousFamilles = new List<string>();
-            List<float> ListePrix = new List<float>();
-
-            // Recuperation des donnees du csv
-
-            var Ligne = Reader.ReadLine(); // Il faut sauter la premiere ligne
-            while (!Reader.EndOfStream)
-            {
-                Ligne = Reader.ReadLine();
-                var Valeurs = Ligne.Split(';');
-                ListeDescriptions.Add(Valeurs[0]);
-                ListeRefs.Add(Valeurs[1]);
-                ListeMarques.Add(Valeurs[2]);
-                ListeFamilles.Add(Valeurs[3]);
-                ListeSousFamilles.Add(Valeurs[4]);
-                ListePrix.Add(float.Parse(Valeurs[5]));
-            }
-
-            // Dans la partie suivante, on va creer les listes contenant les lignes de notre base de données
-            // Chaque methode utilisee peut etre retrouvee a la suite des methodes des deux bouton d'import de la classe actuelle
-
-            List<Marque> AnciennesMarques = new List<Marque>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
-            List<Marque> ListeNouvellesMarques = TrouverNouvellesMarques(ListeMarques, AnciennesMarques);
-
-            List<Famille> ListeAnciennesFamilles = new List<Famille>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
-            List<Famille> ListeNouvellesFamilles = TrouverNouvellesFamilles(ListeFamilles, ListeAnciennesFamilles);
-
-            List<SousFamille> ListeAnciennesSousFamilles = new List<SousFamille>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
-            List<SousFamille> ListeNouvellesSousFamilles = TrouverNouvellesSousFamilles(ListeSousFamilles, ListeAnciennesSousFamilles, ListeNouvellesFamilles, ListeFamilles);
-
-            List<Article> ListeAncienArticles = new List<Article>(); // L'ancienne liste est vide vu qu'on ecrase la bdd
-
-            // On cree la nouvelle liste d'article grace a toutes les listes qu'on a cree avant
-            List<Article> ListeNouveauxArticles = TrouverNouveauxArticles(ListeDescriptions, ListeRefs, ListeMarques, ListeSousFamilles, ListePrix,
-                ListeAncienArticles, ListeNouvellesMarques, ListeNouvellesSousFamilles);
+            progressBar1.PerformStep();
 
             SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
 
@@ -140,6 +155,7 @@ namespace Hector
                 CommandeInsert.ExecuteNonQuery();
             }
 
+            progressBar1.PerformStep();
 
             // Ajout des familles dans la bdd
             foreach (Famille NouvelleFamille in ListeNouvellesFamilles)
@@ -147,6 +163,8 @@ namespace Hector
                 CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + NouvelleFamille.RefFamille + "', '" + NouvelleFamille.NomFamille + "' )";
                 CommandeInsert.ExecuteNonQuery();
             }
+
+            progressBar1.PerformStep();
 
             // Ajout des sous familles à la bdd
             foreach (SousFamille NouvelleSousFamille in ListeNouvellesSousFamilles)
@@ -156,6 +174,8 @@ namespace Hector
                 CommandeInsert.ExecuteNonQuery();
             }
 
+            progressBar1.PerformStep();
+
             // Ajout des articles dans la bdd
             foreach (Article NouvelArticle in ListeNouveauxArticles)
             {
@@ -164,6 +184,8 @@ namespace Hector
                     + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
                 CommandeInsert.ExecuteNonQuery();
             }
+
+            progressBar1.PerformStep();
 
             Con.Close();
         }
@@ -176,6 +198,7 @@ namespace Hector
                 + "\\Hector.sqlite");
 
             Con.Open();
+            progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
 
             // Ouverture du fichier csv
             StreamReader Reader = File.OpenText(FilePath);
@@ -203,17 +226,25 @@ namespace Hector
                 ListePrix.Add(float.Parse(Valeurs[5]));
             }
 
+            progressBar1.PerformStep();
+
             // Dans la partie suivante, on va creer les listes contenant les lignes de notre base de données
             // Chaque methode utilisee peut etre retrouvee a la suite des methodes des deux bouton d'import de la classe actuelle
 
             List<Marque> AnciennesMarques = FonctionsSQLite.SQLiteRecupererMarques(Con); // On recupere la liste dans le fichier SQLite
             List<Marque> ListeNouvellesMarques = TrouverNouvellesMarques(ListeMarques, AnciennesMarques);
 
+            progressBar1.PerformStep();
+
             List<Famille> ListeAnciennesFamilles = FonctionsSQLite.SQLiteRecupererFamilles(Con); // On recupere la liste dans le fichier SQLite
             List<Famille> ListeNouvellesFamilles = TrouverNouvellesFamilles(ListeFamilles, ListeAnciennesFamilles);
 
+            progressBar1.PerformStep();
+
             List<SousFamille> ListeAnciennesSousFamilles = FonctionsSQLite.SQLiteRecupererSousFamilles(Con); // On recupere la liste dans le fichier SQLite
             List<SousFamille> ListeNouvellesSousFamilles = TrouverNouvellesSousFamilles(ListeSousFamilles, ListeAnciennesSousFamilles, ListeNouvellesFamilles, ListeFamilles);
+
+            progressBar1.PerformStep();
 
             List<Article> ListeAncienArticles = FonctionsSQLite.SQLiteRecupererArticles(Con); // On recupere la liste dans le fichier SQLite
 
@@ -221,6 +252,7 @@ namespace Hector
             List<Article> ListeNouveauxArticles = TrouverNouveauxArticles(ListeDescriptions, ListeRefs, ListeMarques, ListeSousFamilles, ListePrix,
                 ListeAncienArticles, ListeNouvellesMarques, ListeNouvellesSousFamilles);
 
+            progressBar1.PerformStep();
 
             // On va remplacer toute la bdd donc on vide les tables
 
@@ -236,6 +268,8 @@ namespace Hector
             CommandeDelete.CommandText = "DELETE  FROM Articles";
             CommandeDelete.ExecuteNonQuery();
 
+            progressBar1.PerformStep();
+
             SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
 
             // Ajout des marques dans la bdd
@@ -244,7 +278,7 @@ namespace Hector
                 CommandeInsert.CommandText = "INSERT INTO Marques(RefMarque, Nom) Values('" + NouvelleMarque.RefMarque + "', '" + NouvelleMarque.NomMarque + "')";
                 CommandeInsert.ExecuteNonQuery();
             }
-
+            progressBar1.PerformStep();
 
             // Ajout des familles dans la bdd
             foreach (Famille NouvelleFamille in ListeNouvellesFamilles)
@@ -252,6 +286,7 @@ namespace Hector
                 CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + NouvelleFamille.RefFamille + "', '" + NouvelleFamille.NomFamille + "' )";
                 CommandeInsert.ExecuteNonQuery();
             }
+            progressBar1.PerformStep();
 
             // Ajout des sous familles à la bdd
             foreach (SousFamille NouvelleSousFamille in ListeNouvellesSousFamilles)
@@ -260,6 +295,7 @@ namespace Hector
                     + NouvelleSousFamille.RefSousFamille + "', '" + NouvelleSousFamille.RefFamille + "', '" + NouvelleSousFamille.NomSousFamille + "' )";
                 CommandeInsert.ExecuteNonQuery();
             }
+            progressBar1.PerformStep();
 
             // Ajout des articles dans la bdd
             foreach (Article NouvelArticle in ListeNouveauxArticles)
@@ -269,6 +305,7 @@ namespace Hector
                     + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
                 CommandeInsert.ExecuteNonQuery();
             }
+            progressBar1.PerformStep();
 
             Con.Close();
         }

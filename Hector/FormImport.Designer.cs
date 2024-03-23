@@ -93,6 +93,9 @@ namespace Hector
             this.Controls.Add(this.ButtonEcrasement);
             this.Controls.Add(this.LabelFileName);
             this.Controls.Add(this.button1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormImport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Form1";
