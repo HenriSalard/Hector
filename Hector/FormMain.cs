@@ -1,11 +1,7 @@
-﻿using System;
+﻿using Hector.Modele;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Hector
@@ -73,34 +69,58 @@ namespace Hector
 
         protected void RefreshTree(string sqlpath)
         {
-            
-            string queryString =
-            "SELECT OrderID, CustomerID FROM dbo.Orders;";
 
-            //Ouverture et lecture de la table
-            using (SQLiteConnection connection =
-                       new SQLiteConnection(sqlpath))
+            treeView1.BeginUpdate();
+
+            treeView1.Nodes.Clear();
+
+            treeView1.Nodes.Add("Tous les articles");
+            treeView1.Nodes.Add("Famille");
+            treeView1.Nodes.Add("Marques");
+
+            //Recupere liste des familles
+            List<Famille> lFamille = new List<Famille>();
+
+            //Pour chaque Famille
+            lFamille.ForEach(delegate(Famille Fam){
+
+                //On ajoute la famille à l'arbre
+                treeView1.Nodes[1].Nodes.Add(Fam.RefFamille.ToString(), Fam.NomFamille);
+
+            });
+
+            //Recupere liste des sous-familles
+            List<SousFamille> lSousFamille = new List<SousFamille>();
+
+            lSousFamille.ForEach(delegate (SousFamille Sousfam){
+
+                //On cherche le noeud de la famille de cette sous famille
+                treeView1.Nodes[1].Nodes.Find(Sousfam.RefFamille.ToString(), false)
+
+                    //On n'en trouve qu'un seul (normalement)
+                    [0].Nodes
+
+                    //On ajoute à ce noeud la SousFamille
+                    .Add(Sousfam.RefSousFamille.ToString(),Sousfam.NomSousFamille
+                );
+
+            });
+
+            //Recupere liste des marques
+            List<Marque> lMarque = new List<Marque>();
+
+            //Pour chaque Marque
+            lMarque.ForEach(delegate (Marque marque)
             {
-                SQLiteCommand command =
-                    new SQLiteCommand(queryString, connection);
-                connection.Open();
+                //On ajoute la marque à l'arbre
+                treeView1.Nodes[2].Nodes.Add(marque.RefMarque.ToString(), marque.NomMarque);
+            });
 
-                SQLiteDataReader reader = command.ExecuteReader();
 
-                // Call Read before accessing data.
-                while (reader.Read())
-                {
-                    //SQLiteDataReader((IDataRecord)reader);
-                }
-
-                // Call Close when done reading.
-                reader.Close();
-            }
-                        
-
-            //treeView1.ExpandAll();
-
+            treeView1.EndUpdate();
+            
         }
+        
     }
 
     
