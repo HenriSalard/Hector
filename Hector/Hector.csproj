@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSVLecteur.cs" />
     <Compile Include="Modele\Article.cs" />
     <Compile Include="Modele\Famille.cs" />
     <Compile Include="FormExport.cs">
