@@ -19,6 +19,7 @@ namespace Hector
         private string FilePath;
         private int ArticleAjoutes;
         private int NbAnomaliesRefArticles;
+        private int NbAnomaliesFamilles;
 
         public FormImport()
         {
@@ -32,7 +33,6 @@ namespace Hector
             this.ArticleAjoutes = 0;
             this.NbAnomaliesRefArticles = 0;
             this.progressBar1.Minimum = 1;
-            this.progressBar1.Maximum = 11;
         }
 
         private void FormImport_Load(object sender, EventArgs e)
@@ -63,9 +63,9 @@ namespace Hector
                     ButtonEcrasement.Enabled = true;
                 }
             }
-            }
+        }
 
-        private void ButtonEcrasement_Click(object sender, EventArgs e)
+        /**private void ButtonEcrasement_Click(object sender, EventArgs e)
         {
             //Trouve le chemin vers le fichier de la bdd
             SQLiteConnection Con = new SQLiteConnection("URI=file:" 
@@ -188,73 +188,36 @@ namespace Hector
             progressBar1.PerformStep();
 
             Con.Close();
-        }
+        }**/
 
-        private void ButtonAjout_Click(object sender, EventArgs e)
+        private void ButtonEcrasement_Click(object sender, EventArgs e)
         {
             //Trouve le chemin vers le fichier de la bdd
-            SQLiteConnection Con = new SQLiteConnection("URI=file:"
-                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+            SQLiteConnection Con = new SQLiteConnection("URI=file:" 
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) 
                 + "\\Hector.sqlite");
 
             Con.Open();
-            progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
 
             // Ouverture du fichier csv
             StreamReader Reader = File.OpenText(FilePath);
 
-            // Creation des listes qui vont contenir les donnees du tableur csv
-            List<string> ListeDescriptions = new List<string>();
-            List<string> ListeRefs = new List<string>();
-            List<string> ListeMarques = new List<string>();
-            List<string> ListeFamilles = new List<string>();
-            List<string> ListeSousFamilles = new List<string>();
-            List<float> ListePrix = new List<float>();
+            // On compte le nombre de lignes du csv pour definir la barre de progression
 
-            // Recuperation des donnees du csv
+            int NbLignes = 0;
 
-            var Ligne = Reader.ReadLine(); // Il faut sauter la premiere ligne
-            while (!Reader.EndOfStream)
+            while (Reader.ReadLine() != null)
             {
-                Ligne = Reader.ReadLine();
-                var Valeurs = Ligne.Split(';');
-                ListeDescriptions.Add(Valeurs[0]);
-                ListeRefs.Add(Valeurs[1]);
-                ListeMarques.Add(Valeurs[2]);
-                ListeFamilles.Add(Valeurs[3]);
-                ListeSousFamilles.Add(Valeurs[4]);
-                ListePrix.Add(float.Parse(Valeurs[5]));
+                NbLignes++;
             }
 
-            progressBar1.PerformStep();
+            // On remet la position du StreamReader au début du fichier
+            Reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
-            // Dans la partie suivante, on va creer les listes contenant les lignes de notre base de données
-            // Chaque methode utilisee peut etre retrouvee a la suite des methodes des deux bouton d'import de la classe actuelle
+            progressBar1.Maximum = NbLignes + 1; // Le remplissage de la barre est proportionnel au nombre d'articles a ajouter
+            progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
 
-            List<Marque> AnciennesMarques = FonctionsSQLite.SQLiteRecupererMarques(Con); // On recupere la liste dans le fichier SQLite
-            List<Marque> ListeNouvellesMarques = TrouverNouvellesMarques(ListeMarques, AnciennesMarques);
-
-            progressBar1.PerformStep();
-
-            List<Famille> ListeAnciennesFamilles = FonctionsSQLite.SQLiteRecupererFamilles(Con); // On recupere la liste dans le fichier SQLite
-            List<Famille> ListeNouvellesFamilles = TrouverNouvellesFamilles(ListeFamilles, ListeAnciennesFamilles);
-
-            progressBar1.PerformStep();
-
-            List<SousFamille> ListeAnciennesSousFamilles = FonctionsSQLite.SQLiteRecupererSousFamilles(Con); // On recupere la liste dans le fichier SQLite
-            List<SousFamille> ListeNouvellesSousFamilles = TrouverNouvellesSousFamilles(ListeSousFamilles, ListeAnciennesSousFamilles, ListeNouvellesFamilles, ListeFamilles);
-
-            progressBar1.PerformStep();
-
-            List<Article> ListeAncienArticles = FonctionsSQLite.SQLiteRecupererArticles(Con); // On recupere la liste dans le fichier SQLite
-
-            // On cree la nouvelle liste d'article grace a toutes les listes qu'on a cree avant
-            List<Article> ListeNouveauxArticles = TrouverNouveauxArticles(ListeDescriptions, ListeRefs, ListeMarques, ListeSousFamilles, ListePrix,
-                ListeAncienArticles, ListeNouvellesMarques, ListeNouvellesSousFamilles);
-
-            progressBar1.PerformStep();
-
-            // On va remplacer toute la bdd donc on vide les tables
+            // On vide chaque table de la base de donnees
 
             SQLiteCommand CommandeDelete = new SQLiteCommand("DELETE FROM SousFamilles", Con);
             CommandeDelete.ExecuteNonQuery();
@@ -268,208 +231,292 @@ namespace Hector
             CommandeDelete.CommandText = "DELETE  FROM Articles";
             CommandeDelete.ExecuteNonQuery();
 
-            progressBar1.PerformStep();
+            //Creation des liste contenant les donnees, pour le moment vide car on a ecrase la bdd 
+            List<Article> ListeArticles = new List<Article>();
+            List<Marque> ListeMarques = new List<Marque>();
+            List<Famille> ListeFamilles = new List<Famille>();
+            List<SousFamille> ListeSousFamilles = new List<SousFamille>();
 
-            SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+            // Definition des donnees du csv
+            string Description = string.Empty;
+            string RefArticle = string.Empty;
+            string StringMarque = string.Empty;
+            string StringFamille = string.Empty;
+            string StringSousFamille = String.Empty;
+            float PrixHT = 0.0F;
 
-            // Ajout des marques dans la bdd
-            foreach (Marque NouvelleMarque in ListeNouvellesMarques)
+            int RefSousFamille = 0;
+            int RefFamille = 0;
+            int RefMarque = 0;
+            bool ArticleExiste = false;
+
+            SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
+
+            var Ligne = Reader.ReadLine(); // Il faut sauter la premiere ligne
+
+            // Maintenant on recupere et anlyse chaque ligne du csv, representant un article
+            while (!Reader.EndOfStream)
             {
-                CommandeInsert.CommandText = "INSERT INTO Marques(RefMarque, Nom) Values('" + NouvelleMarque.RefMarque + "', '" + NouvelleMarque.NomMarque + "')";
-                CommandeInsert.ExecuteNonQuery();
-            }
-            progressBar1.PerformStep();
+                Ligne = Reader.ReadLine();
+                var Valeurs = Ligne.Split(';');
+                Description = Valeurs[0];
+                RefArticle = Valeurs[1];
+                StringMarque = Valeurs[2];
+                StringFamille = Valeurs[3];
+                StringSousFamille = Valeurs[4];
+                PrixHT = float.Parse(Valeurs[5]);
+                ArticleExiste = false;
 
-            // Ajout des familles dans la bdd
-            foreach (Famille NouvelleFamille in ListeNouvellesFamilles)
-            {
-                CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + NouvelleFamille.RefFamille + "', '" + NouvelleFamille.NomFamille + "' )";
-                CommandeInsert.ExecuteNonQuery();
-            }
-            progressBar1.PerformStep();
-
-            // Ajout des sous familles à la bdd
-            foreach (SousFamille NouvelleSousFamille in ListeNouvellesSousFamilles)
-            {
-                CommandeInsert.CommandText = "INSERT INTO SousFamilles(RefSousFamille, RefFamille, Nom) VALUES( '"
-                    + NouvelleSousFamille.RefSousFamille + "', '" + NouvelleSousFamille.RefFamille + "', '" + NouvelleSousFamille.NomSousFamille + "' )";
-                CommandeInsert.ExecuteNonQuery();
-            }
-            progressBar1.PerformStep();
-
-            // Ajout des articles dans la bdd
-            foreach (Article NouvelArticle in ListeNouveauxArticles)
-            {
-                CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
-                    + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
-                    + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
-                CommandeInsert.ExecuteNonQuery();
-            }
-            progressBar1.PerformStep();
-
-            Con.Close();
-        }
-
-        private List<Marque> TrouverNouvellesMarques(List<string> ListeMarques, List<Marque> ListeAnciennesMarques)
-        {
-            List<Marque> ListeNouvellesMarques = ListeAnciennesMarques;
-
-            // On parcoure les string Marques, et on cree un nouvel objet Marque a chaque fois qu'une nouvelle apparait
-            for (int IndiceMarque = 0; IndiceMarque < ListeMarques.Count; IndiceMarque++)
-            {
-
-                // On verifie si la marque (string) existe deja
-                bool MarqueExiste = false;
-                for (int IndiceNouvellesMarques = 0; IndiceNouvellesMarques < ListeNouvellesMarques.Count; IndiceNouvellesMarques++)
+                // En premier on verifie si la famille existe
+                // TrouverRefFamille retourne la ref de la famille, ou -1 si cette famille n'existe pas encore
+                RefFamille = TrouverRefFamille(StringFamille, ListeFamilles);
+                if(RefFamille == -1)
                 {
-                    if (ListeMarques[IndiceMarque] == ListeAnciennesMarques[IndiceNouvellesMarques].NomMarque)
-                    {
-                        MarqueExiste = true;
-                        break;
-                    }
+                    // On cree la nouvelle famille et on l'ajoute a la liste, sa reference est egale au nombre de familles existantes + 1 (auto increment)
+                    Famille NouvelleFamille = new Famille(ListeFamilles.Count + 1, StringFamille);
+                    ListeFamilles.Add(NouvelleFamille);
+                    RefFamille = NouvelleFamille.RefFamille;
+
+                    // On peut ajouter la famille a la bdd
+                    CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + NouvelleFamille.RefFamille + "', '" + NouvelleFamille.NomFamille + "' )";
+                    CommandeInsert.ExecuteNonQuery();
                 }
 
-                // Si la marque n'existe pas on la cree
-                if (!MarqueExiste)
+                // Ensuite on verifie si la sous famille existe
+                // TrouverRefSousFamille retourne la ref de la sous famille, ou -1 si cette sous famille n'existe pas encore
+                RefSousFamille = TrouverRefSousFamille(StringSousFamille, ListeSousFamilles);
+                if (RefSousFamille == -1)
                 {
-                    // Creation de la marque via le constructeur, ref = nombre de marque deja existantes + 1, pour commencer a 1
-                    Marque NouvelleMarque = new Marque(ListeNouvellesMarques.Count + 1, ListeMarques[IndiceMarque]);
-                    ListeNouvellesMarques.Add(NouvelleMarque);
-                }
-            }
 
-            return ListeNouvellesMarques; // La liste a ete mise a jour
-        }
+                    // On cree la nouvelle sous famille et on l'ajoute a la liste, sa reference est egale au nombre de sous familles existantes + 1 (auto increment)
+                    // Sa cle etrangere RefFamille a ete trouvee a l'etape precedente
+                    SousFamille NouvelleSousFamille = new SousFamille(ListeSousFamilles.Count + 1, RefFamille ,StringSousFamille);
+                    ListeSousFamilles.Add(NouvelleSousFamille);
+                    RefSousFamille = NouvelleSousFamille.RefSousFamille;
 
-
-        // Permet de trouver la nouvelle liste de familles, donner une liste vide pour nouvelle bdd
-        private List<Famille> TrouverNouvellesFamilles(List<String> ListeFamilles, List<Famille> ListeAnciennesFamilles)
-        {
-
-            // On parcoure les string familles, et on cree un nouvel objet Famille a chaque fois qu'une nouvelle apparait
-            for (int IndiceFamille = 0; IndiceFamille < ListeFamilles.Count; IndiceFamille++)
-            {
-
-                // On verifie si la famille (string) existe deja
-                bool FamilleExiste = false;
-                for (int IndiceNouvellesFamilles = 0; IndiceNouvellesFamilles < ListeAnciennesFamilles.Count; IndiceNouvellesFamilles++)
-                {
-                    if (ListeFamilles[IndiceFamille] == ListeAnciennesFamilles[IndiceNouvellesFamilles].NomFamille)
-                    {
-                        FamilleExiste = true;
-                        break;
-                    }
+                    // On peut ajouter la sous famille a la bdd
+                    CommandeInsert.CommandText = "INSERT INTO SousFamilles(RefSousFamille, RefFamille, Nom) VALUES( '"
+                        + NouvelleSousFamille.RefSousFamille + "', '" + NouvelleSousFamille.RefFamille + "', '" + NouvelleSousFamille.NomSousFamille + "' )";
+                    CommandeInsert.ExecuteNonQuery();
                 }
 
-                // Si la famille n'existe pas on la cree
-                if (!FamilleExiste)
+                // Ensuite on verifie si la marque existe
+                // TrouverRefMarque retourne la ref de la marque, ou -1 si cette sous marque n'existe pas encore
+                RefMarque = TrouverRefMarque(StringMarque, ListeMarques);
+                if (RefMarque == -1)
                 {
-                    // Creation de la famille via le constructeur, ref = nombre de Familles deja existantes + 1, pour commencer a 1
-                    Famille NouvelleFamille = new Famille(ListeAnciennesFamilles.Count + 1, ListeFamilles[IndiceFamille]);
-                    ListeAnciennesFamilles.Add(NouvelleFamille);
+
+                    // On cree la nouvelle marque et on l'ajoute a la liste, sa reference est egale au nombre de marques existantes + 1 (auto increment)
+                    Marque NouvelleMarque = new Marque(ListeMarques.Count + 1, StringMarque);
+                    ListeMarques.Add(NouvelleMarque);
+                    RefMarque = NouvelleMarque.RefMarque;
+
+                    // On peut ajouter la sous marque a la bdd
+                    CommandeInsert.CommandText = "INSERT INTO Marques(RefMarque, Nom) Values('" + NouvelleMarque.RefMarque + "', '" + NouvelleMarque.NomMarque + "')";
+                    CommandeInsert.ExecuteNonQuery();
                 }
 
-            }
-
-            return ListeAnciennesFamilles; // La liste a ete mise a jour
-        }
-
-        private List<SousFamille> TrouverNouvellesSousFamilles(List<string> ListeSousFamilles, List<SousFamille> ListeAnciennesSousFamilles, List<Famille> ListeFamilles, List<string> FamillesCorrespondantes)
-        {
-            List<SousFamille> ListeNouvellesSousFamilles = ListeAnciennesSousFamilles;
-            int refFamille = 0;
-
-            // On parcoure les string sous familles, et on cree un nouvel objet SousFamille a chaque fois qu'une nouvelle apparait
-            for (int IndiceSousFamille = 0; IndiceSousFamille < ListeSousFamilles.Count; IndiceSousFamille++)
-            {
-
-                // On verifie si la sous famille (string) existe deja
-                bool SousFamilleExiste = false;
-                for (int IndiceAnciennesSousFamilles = 0; IndiceAnciennesSousFamilles < ListeAnciennesSousFamilles.Count; IndiceAnciennesSousFamilles++)
+                // Enfin on verifie si l'article existe deja ou non.
+                for (int IndiceArticle = 0; IndiceArticle < ListeArticles.Count; IndiceArticle++)
                 {
-                    if (ListeSousFamilles[IndiceSousFamille] == ListeNouvellesSousFamilles[IndiceAnciennesSousFamilles].NomSousFamille)
-                    {
-                        SousFamilleExiste = true;
-                        break;
-                    }
-                }
-
-                // Si la famille n'existe pas on la cree
-                if (!SousFamilleExiste)
-                {
-
-                    // On doit trouver la ref de sa famille dans le csv
-                    refFamille = TrouverRefFamille(FamillesCorrespondantes[IndiceSousFamille], ListeFamilles);
-
-                    // Creation de la famille via le constructeur, ref = nombre de SousFamille deja existantes + 1, pour commencer a 1
-                    SousFamille NouvelleSousFamille = new SousFamille(ListeNouvellesSousFamilles.Count + 1
-                        , refFamille ,ListeSousFamilles[IndiceSousFamille]);
-                    ListeNouvellesSousFamilles.Add(NouvelleSousFamille);
-                }
-            }
-
-            return ListeNouvellesSousFamilles;  
-    }
-
-        private List<Article> TrouverNouveauxArticles(List<String> ListeDescriptions, List<string> ListeRefs, List<string> ListeMarques,
-             List<string> ListeSousFamilles ,List<float> ListePrix, List<Article> AncienneListeArticles, List<Marque> ListeMarqueVraie, List<SousFamille> ListeSousFamillesVraie)
-        {
-            List<Article> NouvelleListeArticles = AncienneListeArticles;
-
-            // On commence par regarder si l'article existe deja
-            for (int IndiceArticle = 0; IndiceArticle < ListeDescriptions.Count; IndiceArticle++)
-            {
-                bool ArticleExiste = false;
-                foreach(Article ArticleAComparer in NouvelleListeArticles)
-                {
-                    // Cas ou on trouve un article avec la meme reference
-                    if(ListeRefs[IndiceArticle] == ArticleAComparer.RefArticle)
+                    if(ListeArticles[IndiceArticle].RefArticle == RefArticle)
                     {
                         ArticleExiste = true;
 
-                        // On verifie que la description est la meme
-                        if(ListeDescriptions[IndiceArticle] != ArticleAComparer.Description)
+                        // Si c'est le cas on verifie la conformite des infos
+                        if(ListeArticles[IndiceArticle].Description != Description)
                         {
-                            // Si c'est pas la meme, on remplace l'ancienne description par la nouvelle
-                            ArticleAComparer.Description = ListeDescriptions[IndiceArticle];
-
-                            // TODO GESTION ANOMALIE
+                            NbAnomaliesRefArticles++;
+                            ListeArticles[IndiceArticle].Description = Description; // On met a jour la description
                         }
 
-                        // On verifie aussi qu'ils ont la meme sous famille TODO
-                        if(TrouverRefSousFamille(ListeSousFamilles[IndiceArticle], ListeSousFamillesVraie) != ArticleAComparer.RefSousFamille)
+                        if(ListeArticles[IndiceArticle].RefSousFamille != RefSousFamille)
                         {
-                            // Si anomalie on met a jour
-                            ArticleAComparer.RefSousFamille = TrouverRefSousFamille(ListeSousFamilles[IndiceArticle], ListeSousFamillesVraie);
-
-                            // TODO GESTION ANOMALIE
+                            NbAnomaliesFamilles++;
+                            ListeArticles[IndiceArticle].RefSousFamille = RefSousFamille; // On met a jour la sous famille
                         }
 
-                        // Enfin on verifie qu'ils ont la meme marque TODO
-                        if (TrouverRefMarque(ListeMarques[IndiceArticle], ListeMarqueVraie) != ArticleAComparer.RefMarque)
-                        {
-                            ArticleAComparer.RefMarque = TrouverRefMarque(ListeMarques[IndiceArticle], ListeMarqueVraie);
+                        // Puis on augmente la quantite
+                        ListeArticles[IndiceArticle].Quantite++;
 
-                            // TODO GESTION ANOMALIE
-                        }
-
-                        //On augmente la quantite
-                        ArticleAComparer.Quantite = ArticleAComparer.Quantite + 1;
+                        // On met aussi a jour la bdd
+                        CommandeInsert.CommandText = "UPDATE Article SET Description = '" + Description + "', RefSousFamille = '" + RefSousFamille + "'," +
+                            " Quantite = '" + ListeArticles[IndiceArticle].Quantite + "'";
+                        CommandeInsert.ExecuteNonQuery();
                     }
                 }
                 if (!ArticleExiste)
                 {
-                    // Creation de l'article avec les bons atributs, et une quantite egale a 1
-                    Article NouvelArticle = new Article(ListeRefs[IndiceArticle], TrouverRefSousFamille(ListeSousFamilles[IndiceArticle],
-                        ListeSousFamillesVraie), TrouverRefMarque(ListeMarques[IndiceArticle],
-                        ListeMarqueVraie), ListeDescriptions[IndiceArticle],
-                        ListePrix[IndiceArticle], 1);
-                    NouvelleListeArticles.Add(NouvelArticle);
+                    // s'il n'existe pas on le cree puis on l'ajoute dans la bdd
+                    Article NouvelArticle = new Article(RefArticle, RefSousFamille, RefMarque, Description, PrixHT, 1);
+                    ListeArticles.Add(NouvelArticle);
+                    CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
+                        + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
+                         + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
+                    CommandeInsert.ExecuteNonQuery();
                 }
-                this.ArticleAjoutes++;
+                progressBar1.PerformStep(); // On remplit la barre de progression
             }
 
-            return NouvelleListeArticles;
+            Con.Close();
+        }
+
+        private void ButtonAjout_Click(object sender, EventArgs e)
+        {
+            //Trouve le chemin vers le fichier de la bdd
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            // Ouverture du fichier csv
+            StreamReader Reader = File.OpenText(FilePath);
+
+            // On compte le nombre de lignes du csv pour definir la barre de progression
+
+            int NbLignes = 0;
+
+            while (Reader.ReadLine() != null)
+            {
+                NbLignes++;
+            }
+
+            // On remet la position du StreamReader au début du fichier
+            Reader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+            progressBar1.Maximum = NbLignes + 1; // Le remplissage de la barre est proportionnel au nombre d'articles a ajouter
+            progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
+
+
+            //Creation des liste contenant les donnees, on va les chercher directement dans la bdd
+            List<Article> ListeArticles = FonctionsSQLite.SQLiteRecupererArticles(Con);
+            List<Marque> ListeMarques = FonctionsSQLite.SQLiteRecupererMarques(Con);
+            List<Famille> ListeFamilles = FonctionsSQLite.SQLiteRecupererFamilles(Con);
+            List<SousFamille> ListeSousFamilles = FonctionsSQLite.SQLiteRecupererSousFamilles(Con);
+
+            // Definition des donnees du csv
+            string Description = string.Empty;
+            string RefArticle = string.Empty;
+            string StringMarque = string.Empty;
+            string StringFamille = string.Empty;
+            string StringSousFamille = String.Empty;
+            float PrixHT = 0.0F;
+
+            int RefSousFamille = 0;
+            int RefFamille = 0;
+            int RefMarque = 0;
+            bool ArticleExiste = false;
+
+            SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
+
+            var Ligne = Reader.ReadLine(); // Il faut sauter la premiere ligne
+
+            // Maintenant on recupere et anlyse chaque ligne du csv, representant un article
+            while (!Reader.EndOfStream)
+            {
+                Ligne = Reader.ReadLine();
+                var Valeurs = Ligne.Split(';');
+                Description = Valeurs[0];
+                RefArticle = Valeurs[1];
+                StringMarque = Valeurs[2];
+                StringFamille = Valeurs[3];
+                StringSousFamille = Valeurs[4];
+                PrixHT = float.Parse(Valeurs[5]);
+                ArticleExiste = false;
+
+                // En premier on verifie si la famille existe
+                // TrouverRefFamille retourne la ref de la famille, ou -1 si cette famille n'existe pas encore
+                RefFamille = TrouverRefFamille(StringFamille, ListeFamilles);
+                if (RefFamille == -1)
+                {
+                    // On cree la nouvelle famille et on l'ajoute a la liste, sa reference est egale au nombre de familles existantes + 1 (auto increment)
+                    Famille NouvelleFamille = new Famille(ListeFamilles.Count + 1, StringFamille);
+                    ListeFamilles.Add(NouvelleFamille);
+                    RefFamille = NouvelleFamille.RefFamille;
+
+                    // On peut ajouter la famille a la bdd
+                    CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + NouvelleFamille.RefFamille + "', '" + NouvelleFamille.NomFamille + "' )";
+                    CommandeInsert.ExecuteNonQuery();
+                }
+
+                // Ensuite on verifie si la sous famille existe
+                // TrouverRefSousFamille retourne la ref de la sous famille, ou -1 si cette sous famille n'existe pas encore
+                RefSousFamille = TrouverRefSousFamille(StringSousFamille, ListeSousFamilles);
+                if (RefSousFamille == -1)
+                {
+
+                    // On cree la nouvelle sous famille et on l'ajoute a la liste, sa reference est egale au nombre de sous familles existantes + 1 (auto increment)
+                    // Sa cle etrangere RefFamille a ete trouvee a l'etape precedente
+                    SousFamille NouvelleSousFamille = new SousFamille(ListeSousFamilles.Count + 1, RefFamille, StringSousFamille);
+                    ListeSousFamilles.Add(NouvelleSousFamille);
+                    RefSousFamille = NouvelleSousFamille.RefSousFamille;
+
+                    // On peut ajouter la sous famille a la bdd
+                    CommandeInsert.CommandText = "INSERT INTO SousFamilles(RefSousFamille, RefFamille, Nom) VALUES( '"
+                        + NouvelleSousFamille.RefSousFamille + "', '" + NouvelleSousFamille.RefFamille + "', '" + NouvelleSousFamille.NomSousFamille + "' )";
+                    CommandeInsert.ExecuteNonQuery();
+                }
+
+                // Ensuite on verifie si la marque existe
+                // TrouverRefMarque retourne la ref de la marque, ou -1 si cette sous marque n'existe pas encore
+                RefMarque = TrouverRefMarque(StringMarque, ListeMarques);
+                if (RefMarque == -1)
+                {
+
+                    // On cree la nouvelle marque et on l'ajoute a la liste, sa reference est egale au nombre de marques existantes + 1 (auto increment)
+                    Marque NouvelleMarque = new Marque(ListeMarques.Count + 1, StringMarque);
+                    ListeMarques.Add(NouvelleMarque);
+                    RefMarque = NouvelleMarque.RefMarque;
+
+                    // On peut ajouter la sous marque a la bdd
+                    CommandeInsert.CommandText = "INSERT INTO Marques(RefMarque, Nom) Values('" + NouvelleMarque.RefMarque + "', '" + NouvelleMarque.NomMarque + "')";
+                    CommandeInsert.ExecuteNonQuery();
+                }
+
+                // Enfin on verifie si l'article existe deja ou non.
+                for (int IndiceArticle = 0; IndiceArticle < ListeArticles.Count; IndiceArticle++)
+                {
+                    if (ListeArticles[IndiceArticle].RefArticle == RefArticle)
+                    {
+                        ArticleExiste = true;
+
+                        // Si c'est le cas on verifie la conformite des infos
+                        if (ListeArticles[IndiceArticle].Description != Description)
+                        {
+                            NbAnomaliesRefArticles++;
+                            ListeArticles[IndiceArticle].Description = Description; // On met a jour la description
+                        }
+
+                        if (ListeArticles[IndiceArticle].RefSousFamille != RefSousFamille)
+                        {
+                            NbAnomaliesFamilles++;
+                            ListeArticles[IndiceArticle].RefSousFamille = RefSousFamille; // On met a jour la sous famille
+                        }
+
+                        // Puis on augmente la quantite
+                        ListeArticles[IndiceArticle].Quantite++;
+
+                        // On met aussi a jour la bdd
+                        CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + Description + "', RefSousFamille = '" + RefSousFamille + "'," +
+                            " Quantite = '" + ListeArticles[IndiceArticle].Quantite + "'";
+                        CommandeInsert.ExecuteNonQuery();
+                    }
+                }
+                if (!ArticleExiste)
+                {
+                    // s'il n'existe pas on le cree puis on l'ajoute dans la bdd
+                    Article NouvelArticle = new Article(RefArticle, RefSousFamille, RefMarque, Description, PrixHT, 1);
+                    ListeArticles.Add(NouvelArticle);
+                    CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
+                        + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
+                         + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
+                    CommandeInsert.ExecuteNonQuery();
+                }
+                progressBar1.PerformStep(); // On remplit la barre de progression
+            }
+
+            Con.Close();
         }
 
         private static int TrouverRefFamille(string NomDeLaFamille, List<Famille> ListeFamilles)
@@ -490,7 +537,7 @@ namespace Hector
             {
                 if (NomDeLaFamille == SousFamilleAComparer.NomSousFamille)
                 {
-                    return SousFamilleAComparer.RefFamille;
+                    return SousFamilleAComparer.RefSousFamille;
                 }
             }
             return -1;
