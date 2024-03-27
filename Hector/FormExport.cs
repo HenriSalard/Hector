@@ -52,8 +52,13 @@ namespace Hector
                     progressBar1.Value = 1;
                     progressBar1.Step = 1;
 
+                    //On vide le fichier
+                    File.WriteAllText(openFileDialog.FileName, "");
+
                     using (StreamWriter Writer = File.AppendText(openFileDialog.FileName))
                     {
+                    
+
                         Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T.");
 
                         progressBar1.PerformStep();
@@ -74,11 +79,15 @@ namespace Hector
 
                             progressBar1.PerformStep();
                         }
+
+                        MessageBox.Show("Le fichier a bien été exporté!", "Information");
                     }
                 }
             }
 
             Con.Close();
+
+            this.Close();
         }
 
         private void FormExport_Load(object sender, EventArgs e)
