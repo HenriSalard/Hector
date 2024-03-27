@@ -67,6 +67,8 @@ namespace Hector
         private void FormMain_Load(object sender, EventArgs e)
         {
 
+            this.RefreshTree();
+
         }
 
         protected void RefreshTree()
