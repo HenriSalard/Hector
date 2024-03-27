@@ -97,7 +97,28 @@ namespace Hector.Modele
             return Liste;
         }
 
+        public static List<SousFamille> SQLiteSousFamilleFromFamilleName(SQLiteConnection Con,string FamilleName)
+        {
+            List<SousFamille> Liste = new List<SousFamille>();
+            
+            string requette = "SELECT RefSousFamille, SousFamilles.RefFamille, SousFamilles.Nom FROM SousFamilles, Familles WHERE SousFamilles.RefFamille = Familles.RefFamille and Familles.Nom = '" + FamilleName+"'";
 
+
+            SQLiteCommand CommandeSQLite = new SQLiteCommand(requette, Con);
+
+            SQLiteDataReader Lecteur = CommandeSQLite.ExecuteReader();
+
+            while (Lecteur.Read())
+            {
+
+                // Créé un objet Familles pour chaqueligne de la table Familles de la base de données
+                SousFamille NouvelleSousFamille = new SousFamille(Lecteur.GetInt32(0), Lecteur.GetInt32(1), Lecteur.GetString(2));
+                Liste.Add(NouvelleSousFamille);
+            }
+            Lecteur.Close();
+
+            return Liste;
+        }
 
     }
 }

@@ -134,7 +134,27 @@ namespace Hector
             
         }
 
-        protected void RefreshListArticle(string Category, string nomnoeud)
+        protected void HideColumns()
+        {
+            listView1.Columns[0].Width = 0;
+            listView1.Columns[2].Width = 0;
+            listView1.Columns[3].Width = 0;
+            listView1.Columns[4].Width = 0;
+            listView1.Columns[5].Width = 0;
+        }
+
+        protected void ShowColumns()
+        {
+            listView1.Columns[0].Width = -2;
+            listView1.Columns[1].Width = -2;
+            listView1.Columns[2].Width = -2;
+            listView1.Columns[3].Width = -2;
+            listView1.Columns[4].Width = -2;
+            listView1.Columns[5].Width = -2;
+
+        }
+
+        protected void RefreshListArticle(string Category, string Nomnoeud)
         {
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
                 + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
@@ -156,6 +176,7 @@ namespace Hector
 
             if (Category.Equals("NoeudArticle"))
             {
+                ShowColumns();
 
                 ListViewItem Item;
 
@@ -163,8 +184,8 @@ namespace Hector
 
                 foreach(var Article in ListArticle)
                 {
-                    Array[1] = Article.Description;
-                    Array[0] = Article.RefArticle;
+                    Array[0] = Article.Description;
+                    Array[1] = Article.RefArticle;
                     SousFamille SousFam = ListSousFamille[Article.RefSousFamille - 1];
                     Famille Fam = ListFamille[SousFam.RefFamille - 1];
                     Array[2] = Fam.NomFamille;
@@ -182,7 +203,7 @@ namespace Hector
             }
             else if (Category.Equals("NoeudMarque"))
             {
-                
+                HideColumns();
 
                 string[] Array = new string[2];
 
@@ -190,7 +211,6 @@ namespace Hector
 
                 foreach (var Marque in ListMarque)
                 {
-                    Array[0] = Marque.RefMarque.ToString();
                     Array[1] = Marque.NomMarque;
 
                     Item = new ListViewItem(Array);
@@ -199,15 +219,45 @@ namespace Hector
             }
             else if (Category.Equals("NoeudFamille"))
             {
+                HideColumns();
+
+                string[] Array = new string[2];
+
+                ListViewItem Item;
+
+                foreach (var Famille in ListFamille)
+                {
+                    Array[1] = Famille.NomFamille;
+
+                    Item = new ListViewItem(Array);
+                    this.listView1.Items.Add(Item);
+                }
 
             }
-            else
+            else if (Category.Equals("NoeudSousFamille"))
             {
+
+                //Chercher les sousfamilles de la famille NomNoeud
+                List<SousFamille> ListSousFamille2 = FonctionsSQLite.SQLiteSousFamilleFromFamilleName(Con, Nomnoeud);
+
+                HideColumns();
+
+                string[] Array = new string[2];
+
+                ListViewItem Item;
+
+                foreach (var SousFamille in ListSousFamille2)
+                {
+                    Array[1] = SousFamille.NomSousFamille;
+
+                    Item = new ListViewItem(Array);
+                    this.listView1.Items.Add(Item);
+                }
 
             }
 
             this.listView1.EndUpdate();
-
+            Con.Close();
 
         }
 
@@ -232,8 +282,15 @@ namespace Hector
             {
                 RefreshListArticle("NoeudArticle",null);
             }
-            
-
+            else if(Node.FullPath.Equals("Famille"))
+            {
+                RefreshListArticle("NoeudFamille", null);
+            }
+            //Le cas sousfamille
+            else if (Node.Parent.FullPath.Equals("Famille"))
+            {
+                RefreshListArticle("NoeudSousFamille", Node.Text);
+            }
         }
     }
 

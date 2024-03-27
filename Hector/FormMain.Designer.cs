@@ -167,12 +167,10 @@ namespace Hector
             // 
             // RefArticle
             // 
-            this.RefArticle.DisplayIndex = 1;
             this.RefArticle.Text = "RefArticle";
             // 
             // Description
             // 
-            this.Description.DisplayIndex = 0;
             this.Description.Text = "Description";
             // 
             // Familles
