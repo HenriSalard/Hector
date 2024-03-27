@@ -65,6 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSVLecteur.cs" />
+    <Compile Include="FormImport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormImport.Designer.cs" />
     <Compile Include="Modele\Article.cs" />
     <Compile Include="Modele\Famille.cs" />
     <Compile Include="FormExport.cs">
@@ -72,12 +76,6 @@
     </Compile>
     <Compile Include="FormExport.Designer.cs">
       <DependentUpon>FormExport.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormImport.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormImport.Designer.cs">
-      <DependentUpon>FormImport.cs</DependentUpon>
     </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
@@ -93,9 +91,7 @@
     <EmbeddedResource Include="FormExport.resx">
       <DependentUpon>FormExport.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormImport.resx">
-      <DependentUpon>FormImport.cs</DependentUpon>
-    </EmbeddedResource>
+    <EmbeddedResource Include="FormImport.resx" />
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>

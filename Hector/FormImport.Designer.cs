@@ -98,7 +98,7 @@ namespace Hector
             this.MinimizeBox = false;
             this.Name = "FormImport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Form1";
+            this.Text = "Importer un fichier";
             this.Load += new System.EventHandler(this.FormImport_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
