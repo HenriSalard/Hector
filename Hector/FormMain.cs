@@ -152,6 +152,8 @@ namespace Hector
 
             this.listView1.BeginUpdate();
 
+            listView1.Items.Clear();
+
             if (Category.Equals("NoeudArticle"))
             {
 
@@ -188,8 +190,8 @@ namespace Hector
 
                 foreach (var Marque in ListMarque)
                 {
-                    Array[1] = Marque.RefMarque.ToString();
-                    Array[0] = Marque.NomMarque;
+                    Array[0] = Marque.RefMarque.ToString();
+                    Array[1] = Marque.NomMarque;
 
                     Item = new ListViewItem(Array);
                     this.listView1.Items.Add(Item);
