@@ -33,6 +33,8 @@ namespace Hector
 
             // Suppression de la fenetre Importer
 
+            this.RefreshTree();
+
             ImportDialog.Dispose();
 
 
@@ -67,8 +69,14 @@ namespace Hector
 
         }
 
-        protected void RefreshTree(string sqlpath)
+        protected void RefreshTree()
         {
+
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
 
             treeView1.BeginUpdate();
 
@@ -79,7 +87,7 @@ namespace Hector
             treeView1.Nodes.Add("Marques");
 
             //Recupere liste des familles
-            List<Famille> lFamille = new List<Famille>();
+            List<Famille> lFamille = FonctionsSQLite.SQLiteRecupererFamilles(Con);
 
             //Pour chaque Famille
             lFamille.ForEach(delegate(Famille Fam){
@@ -90,7 +98,7 @@ namespace Hector
             });
 
             //Recupere liste des sous-familles
-            List<SousFamille> lSousFamille = new List<SousFamille>();
+            List<SousFamille> lSousFamille = FonctionsSQLite.SQLiteRecupererSousFamilles(Con);
 
             lSousFamille.ForEach(delegate (SousFamille Sousfam){
 
@@ -107,7 +115,7 @@ namespace Hector
             });
 
             //Recupere liste des marques
-            List<Marque> lMarque = new List<Marque>();
+            List<Marque> lMarque = FonctionsSQLite.SQLiteRecupererMarques(Con);
 
             //Pour chaque Marque
             lMarque.ForEach(delegate (Marque marque)
@@ -116,11 +124,19 @@ namespace Hector
                 treeView1.Nodes[2].Nodes.Add(marque.RefMarque.ToString(), marque.NomMarque);
             });
 
+            treeView1.CollapseAll();
 
             treeView1.EndUpdate();
             
         }
-        
+
+        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+
+            
+
+
+        }
     }
 
     
