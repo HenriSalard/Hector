@@ -134,11 +134,103 @@ namespace Hector
             
         }
 
+        protected void RefreshListArticle(string Category, string nomnoeud)
+        {
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            List<Article> ListArticle = FonctionsSQLite.SQLiteRecupererArticles(Con);
+
+            List<Marque> ListMarque = FonctionsSQLite.SQLiteRecupererMarques(Con);
+
+            List<Famille> ListFamille = FonctionsSQLite.SQLiteRecupererFamilles(Con);
+
+            List<SousFamille> ListSousFamille = FonctionsSQLite.SQLiteRecupererSousFamilles(Con);
+
+            this.listView1.BeginUpdate();
+
+            if (Category.Equals("NoeudArticle"))
+            {
+
+                ListViewItem Item;
+
+                string[] Array = new string[6];
+
+                foreach(var Article in ListArticle)
+                {
+                    Array[1] = Article.Description;
+                    Array[0] = Article.RefArticle;
+                    SousFamille SousFam = ListSousFamille[Article.RefSousFamille - 1];
+                    Famille Fam = ListFamille[SousFam.RefFamille - 1];
+                    Array[2] = Fam.NomFamille;
+                    Array[3] = SousFam.NomSousFamille;
+                    Marque Marque = ListMarque[Article.RefMarque - 1];
+                    Array[4] = Marque.NomMarque;
+                    Array[5] = Article.Quantite.ToString();
+
+                    Item = new ListViewItem(Array);
+                    this.listView1.Items.Add(Item);
+
+                }
+
+
+            }
+            else if (Category.Equals("NoeudMarque"))
+            {
+                
+
+                string[] Array = new string[2];
+
+                ListViewItem Item;
+
+                foreach (var Marque in ListMarque)
+                {
+                    Array[1] = Marque.RefMarque.ToString();
+                    Array[0] = Marque.NomMarque;
+
+                    Item = new ListViewItem(Array);
+                    this.listView1.Items.Add(Item);
+                }
+            }
+            else if (Category.Equals("NoeudFamille"))
+            {
+
+            }
+            else
+            {
+
+            }
+
+            this.listView1.EndUpdate();
+
+
+        }
+
         private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
 
             
 
+
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
+            TreeNode Node = treeView1.SelectedNode;
+
+            if (Node.FullPath.Equals("Marques"))
+            {
+                RefreshListArticle("NoeudMarque", null);
+            }
+            else if (Node.FullPath.Equals("Tous les articles"))
+            {
+                RefreshListArticle("NoeudArticle",null);
+            }
+            
 
         }
     }

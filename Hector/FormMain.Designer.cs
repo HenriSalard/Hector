@@ -41,6 +41,12 @@ namespace Hector
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.RefArticle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Description = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Familles = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.SousFamilles = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Marques = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Quantité = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -137,12 +143,20 @@ namespace Hector
             this.treeView1.Size = new System.Drawing.Size(260, 394);
             this.treeView1.TabIndex = 0;
             this.treeView1.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeSelect);
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // listView1
             // 
             this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.RefArticle,
+            this.Description,
+            this.Familles,
+            this.SousFamilles,
+            this.Marques,
+            this.Quantité});
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(-1, 0);
             this.listView1.Name = "listView1";
@@ -150,6 +164,32 @@ namespace Hector
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // RefArticle
+            // 
+            this.RefArticle.DisplayIndex = 1;
+            this.RefArticle.Text = "RefArticle";
+            // 
+            // Description
+            // 
+            this.Description.DisplayIndex = 0;
+            this.Description.Text = "Description";
+            // 
+            // Familles
+            // 
+            this.Familles.Text = "Familles";
+            // 
+            // SousFamilles
+            // 
+            this.SousFamilles.Text = "Sous-Familles";
+            // 
+            // Marques
+            // 
+            this.Marques.Text = "Marques";
+            // 
+            // Quantité
+            // 
+            this.Quantité.Text = "Quantité";
             // 
             // FormMain
             // 
@@ -185,6 +225,12 @@ namespace Hector
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader RefArticle;
+        private System.Windows.Forms.ColumnHeader Description;
+        private System.Windows.Forms.ColumnHeader Familles;
+        private System.Windows.Forms.ColumnHeader SousFamilles;
+        private System.Windows.Forms.ColumnHeader Marques;
+        private System.Windows.Forms.ColumnHeader Quantité;
     }
 }
 
