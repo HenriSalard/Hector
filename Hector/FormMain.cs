@@ -129,6 +129,8 @@ namespace Hector
             treeView1.CollapseAll();
 
             treeView1.EndUpdate();
+
+            Con.Close();
             
         }
 
