@@ -1,5 +1,6 @@
 ﻿using Hector.Modele;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Windows.Forms;
@@ -8,6 +9,43 @@ namespace Hector
 {
     public partial class FormMain : Form
     {
+
+        List<Article> ListArticle;
+
+        List<Famille> ListFamille;
+
+        List<SousFamille> ListSousFamille;
+
+        List<Marque> ListMarque;
+
+        private ListViewColumnSorter lvwColumnSorter;
+
+        public void LoadLists()
+        {
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            ListArticle = FonctionsSQLite.SQLiteRecupererArticles(Con);
+
+            ListMarque = FonctionsSQLite.SQLiteRecupererMarques(Con);
+
+            ListFamille = FonctionsSQLite.SQLiteRecupererFamilles(Con);
+
+            ListSousFamille = FonctionsSQLite.SQLiteRecupererSousFamilles(Con);
+
+            Con.Close();
+        }
+
+
+
+
+
+
+
+
         public FormMain()
         {
             InitializeComponent();
@@ -69,17 +107,16 @@ namespace Hector
 
             this.RefreshTree();
 
+            lvwColumnSorter = new ListViewColumnSorter();
+            this.listView1.ListViewItemSorter = lvwColumnSorter;
+
         }
 
         protected void RefreshTree()
         {
 
-            SQLiteConnection Con = new SQLiteConnection("URI=file:"
-                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
-                + "\\Hector.sqlite");
-
-            Con.Open();
-
+            LoadLists();
+            
             treeView1.BeginUpdate();
 
             treeView1.Nodes.Clear();
@@ -87,22 +124,17 @@ namespace Hector
             treeView1.Nodes.Add("Tous les articles");
             treeView1.Nodes.Add("Famille");
             treeView1.Nodes.Add("Marques");
-
-            //Recupere liste des familles
-            List<Famille> lFamille = FonctionsSQLite.SQLiteRecupererFamilles(Con);
+            
 
             //Pour chaque Famille
-            lFamille.ForEach(delegate(Famille Fam){
+            ListFamille.ForEach(delegate(Famille Fam){
 
                 //On ajoute la famille à l'arbre
                 treeView1.Nodes[1].Nodes.Add(Fam.RefFamille.ToString(), Fam.NomFamille);
 
             });
 
-            //Recupere liste des sous-familles
-            List<SousFamille> lSousFamille = FonctionsSQLite.SQLiteRecupererSousFamilles(Con);
-
-            lSousFamille.ForEach(delegate (SousFamille Sousfam){
+            ListSousFamille.ForEach(delegate (SousFamille Sousfam){
 
                 //On cherche le noeud de la famille de cette sous famille
                 treeView1.Nodes[1].Nodes.Find(Sousfam.RefFamille.ToString(), false)
@@ -115,12 +147,9 @@ namespace Hector
                 );
 
             });
-
-            //Recupere liste des marques
-            List<Marque> lMarque = FonctionsSQLite.SQLiteRecupererMarques(Con);
-
+            
             //Pour chaque Marque
-            lMarque.ForEach(delegate (Marque marque)
+            ListMarque.ForEach(delegate (Marque marque)
             {
                 //On ajoute la marque à l'arbre
                 treeView1.Nodes[2].Nodes.Add(marque.RefMarque.ToString(), marque.NomMarque);
@@ -129,8 +158,6 @@ namespace Hector
             treeView1.CollapseAll();
 
             treeView1.EndUpdate();
-
-            Con.Close();
             
         }
 
@@ -154,21 +181,8 @@ namespace Hector
 
         }
 
-        protected void RefreshListArticle(string Category, string Nomnoeud)
-        {
-            SQLiteConnection Con = new SQLiteConnection("URI=file:"
-                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
-                + "\\Hector.sqlite");
-
-            Con.Open();
-
-            List<Article> ListArticle = FonctionsSQLite.SQLiteRecupererArticles(Con);
-
-            List<Marque> ListMarque = FonctionsSQLite.SQLiteRecupererMarques(Con);
-
-            List<Famille> ListFamille = FonctionsSQLite.SQLiteRecupererFamilles(Con);
-
-            List<SousFamille> ListSousFamille = FonctionsSQLite.SQLiteRecupererSousFamilles(Con);
+        protected void RefreshListArticle(string Category, string Refnoeud)
+        {           
 
             this.listView1.BeginUpdate();
 
@@ -182,10 +196,10 @@ namespace Hector
 
                 string[] Array = new string[6];
 
-                foreach(var Article in ListArticle)
+                foreach (var Article in ListArticle)
                 {
-                    Array[0] = Article.Description;
-                    Array[1] = Article.RefArticle;
+                    Array[0] = Article.RefArticle;
+                    Array[1] = Article.Description;
                     SousFamille SousFam = ListSousFamille[Article.RefSousFamille - 1];
                     Famille Fam = ListFamille[SousFam.RefFamille - 1];
                     Array[2] = Fam.NomFamille;
@@ -205,7 +219,7 @@ namespace Hector
             {
                 HideColumns();
 
-                string[] Array = new string[2];
+                string[] Array = new string[6];
 
                 ListViewItem Item;
 
@@ -221,7 +235,7 @@ namespace Hector
             {
                 HideColumns();
 
-                string[] Array = new string[2];
+                string[] Array = new string[6];
 
                 ListViewItem Item;
 
@@ -237,12 +251,20 @@ namespace Hector
             else if (Category.Equals("NoeudSousFamille"))
             {
 
+                SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+                Con.Open();
+
                 //Chercher les sousfamilles de la famille NomNoeud
-                List<SousFamille> ListSousFamille2 = FonctionsSQLite.SQLiteSousFamilleFromFamilleName(Con, Nomnoeud);
+                List<SousFamille> ListSousFamille2 = FonctionsSQLite.SQLiteSousFamilleFromFamilleName(Con, Refnoeud);
+
+                Con.Close();
 
                 HideColumns();
 
-                string[] Array = new string[2];
+                string[] Array = new string[6];
 
                 ListViewItem Item;
 
@@ -255,9 +277,79 @@ namespace Hector
                 }
 
             }
+            else if (Category.Equals("SousArticle"))
+            {
+
+                ShowColumns();
+
+                ListViewItem Item;
+
+                string[] Array = new string[6];
+
+                List<Article> ResultArticle = ListArticle.FindAll(
+                    delegate (Article Article)
+                    {
+                        return Article.RefSousFamille.ToString() == Refnoeud;
+                    }
+                );
+                if (ResultArticle != null)
+                {
+                    foreach (var Article in ResultArticle)
+                    {
+                        Array[1] = Article.Description;
+                        Array[0] = Article.RefArticle;
+                        SousFamille SousFam = ListSousFamille[Article.RefSousFamille - 1];
+                        Famille Fam = ListFamille[SousFam.RefFamille - 1];
+                        Array[2] = Fam.NomFamille;
+                        Array[3] = SousFam.NomSousFamille;
+                        Marque Marque = ListMarque[Article.RefMarque - 1];
+                        Array[4] = Marque.NomMarque;
+                        Array[5] = Article.Quantite.ToString();
+
+                        Item = new ListViewItem(Array);
+                        this.listView1.Items.Add(Item);
+                    }
+
+                }
+
+            }
+            else if (Category.Equals("MarqueArticle"))
+            {
+                ShowColumns();
+
+                ListViewItem Item;
+
+                string[] Array = new string[6];
+
+                List<Article> ResultArticle = ListArticle.FindAll(
+                    delegate (Article Article)
+                    {
+                        return Article.RefMarque.ToString() == Refnoeud;
+                    }
+                );
+                if (ResultArticle != null)
+                {
+                    foreach (var Article in ResultArticle)
+                    {
+                        Array[1] = Article.Description;
+                        Array[0] = Article.RefArticle;
+                        SousFamille SousFam = ListSousFamille[Article.RefSousFamille - 1];
+                        Famille Fam = ListFamille[SousFam.RefFamille - 1];
+                        Array[2] = Fam.NomFamille;
+                        Array[3] = SousFam.NomSousFamille;
+                        Marque Marque = ListMarque[Article.RefMarque - 1];
+                        Array[4] = Marque.NomMarque;
+                        Array[5] = Article.Quantite.ToString();
+
+                        Item = new ListViewItem(Array);
+                        this.listView1.Items.Add(Item);
+                    }
+
+                }
+
+            }
 
             this.listView1.EndUpdate();
-            Con.Close();
 
         }
 
@@ -290,6 +382,169 @@ namespace Hector
             else if (Node.Parent.FullPath.Equals("Famille"))
             {
                 RefreshListArticle("NoeudSousFamille", Node.Text);
+            }
+            //Le cas des Articles des Marques
+            else if (Node.Parent.FullPath.Equals("Marques"))
+            {
+                RefreshListArticle("MarqueArticle", Node.Name);
+            }
+            //Le cas Article de sous famille
+            else if (Node.Parent.Parent.FullPath.Equals("Famille"))
+            {
+                RefreshListArticle("SousArticle", Node.Name);
+            }
+            
+        }
+
+        private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine if clicked column is already the column that is being sorted.
+            if (e.Column == lvwColumnSorter.SortColumn)
+            {
+                // Reverse the current sort direction for this column.
+                if (lvwColumnSorter.Order == SortOrder.Ascending)
+                {
+                    lvwColumnSorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    lvwColumnSorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                // Set the column number that is to be sorted; default to ascending.
+                lvwColumnSorter.SortColumn = e.Column;
+                lvwColumnSorter.Order = SortOrder.Ascending;
+            }
+
+            // Perform the sort with these new sort options.
+            this.listView1.Sort();
+        }
+
+        public class ListViewColumnSorter : IComparer
+        {
+            /// <summary>
+            /// Specifies the column to be sorted
+            /// </summary>
+            private int ColumnToSort;
+            /// <summary>
+            /// Specifies the order in which to sort (i.e. 'Ascending').
+            /// </summary>
+            private SortOrder OrderOfSort;
+            /// <summary>
+            /// Case insensitive comparer object
+            /// </summary>
+            private CaseInsensitiveComparer ObjectCompare;
+
+            /// <summary>
+            /// Class constructor.  Initializes various elements
+            /// </summary>
+            public ListViewColumnSorter()
+            {
+                // Initialize the column to '0'
+                ColumnToSort = 0;
+
+                // Initialize the sort order to 'none'
+                OrderOfSort = SortOrder.None;
+
+                // Initialize the CaseInsensitiveComparer object
+                ObjectCompare = new CaseInsensitiveComparer();
+            }
+
+            /// <summary>
+            /// This method is inherited from the IComparer interface.  It compares the two objects passed using a case insensitive comparison.
+            /// </summary>
+            /// <param name="x">First object to be compared</param>
+            /// <param name="y">Second object to be compared</param>
+            /// <returns>The result of the comparison. "0" if equal, negative if 'x' is less than 'y' and positive if 'x' is greater than 'y'</returns>
+            public int Compare(object x, object y)
+            {
+                int compareResult;
+                ListViewItem listviewX, listviewY;
+
+                // Cast the objects to be compared to ListViewItem objects
+                listviewX = (ListViewItem)x;
+                listviewY = (ListViewItem)y;
+
+                decimal num = 0;
+                if (decimal.TryParse(listviewX.SubItems[ColumnToSort].Text, out num))
+                {
+                    compareResult = decimal.Compare(num, Convert.ToDecimal(listviewY.SubItems[ColumnToSort].Text));
+                }
+                else
+                {
+                    // Compare the two items
+                    compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+                }
+
+                // Calculate correct return value based on object comparison
+                if (OrderOfSort == SortOrder.Ascending)
+                {
+                    // Ascending sort is selected, return normal result of compare operation
+                    return compareResult;
+                }
+                else if (OrderOfSort == SortOrder.Descending)
+                {
+                    // Descending sort is selected, return negative result of compare operation
+                    return (-compareResult);
+                }
+                else
+                {
+                    // Return '0' to indicate they are equal
+                    return 0;
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets the number of the column to which to apply the sorting operation (Defaults to '0').
+            /// </summary>
+            public int SortColumn
+            {
+                set
+                {
+                    ColumnToSort = value;
+                }
+                get
+                {
+                    return ColumnToSort;
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets the order of sorting to apply (for example, 'Ascending' or 'Descending').
+            /// </summary>
+            public SortOrder Order
+            {
+                set
+                {
+                    OrderOfSort = value;
+                }
+                get
+                {
+                    return OrderOfSort;
+                }
+            }
+
+        }
+
+        private void actualiserToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AllRefresh();
+        }
+
+        private void AllRefresh()
+        {
+            LoadLists();
+            RefreshTree();
+            RefreshListArticle("NoeudArticle", null);
+        }
+
+        private void FormMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.F5)
+            {
+                AllRefresh();
             }
         }
     }
