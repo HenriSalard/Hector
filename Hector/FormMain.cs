@@ -25,18 +25,15 @@ namespace Hector
             
             if (ImportDialog.ShowDialog(this) == DialogResult.OK)
             {
-                
+                // Suppression de la fenetre Importer
+
+                this.RefreshTree();
+
+                ImportDialog.Dispose();
             }
             else
             {
             }
-
-            // Suppression de la fenetre Importer
-
-            this.RefreshTree();
-
-            ImportDialog.Dispose();
-
 
         }
 

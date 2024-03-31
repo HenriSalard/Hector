@@ -65,6 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSVLecteur.cs" />
+    <Compile Include="FormAjouterModifier.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAjouterModifier.Designer.cs">
+      <DependentUpon>FormAjouterModifier.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modele\Article.cs" />
     <Compile Include="Modele\Famille.cs" />
     <Compile Include="FormExport.cs">
@@ -90,6 +96,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modele\SousFamille.cs" />
+    <EmbeddedResource Include="FormAjouterModifier.resx">
+      <DependentUpon>FormAjouterModifier.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormExport.resx">
       <DependentUpon>FormExport.cs</DependentUpon>
     </EmbeddedResource>
