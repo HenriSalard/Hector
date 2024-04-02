@@ -106,6 +106,7 @@ namespace Hector
 
             lvwColumnSorter = new ListViewColumnSorter();
             this.listView1.ListViewItemSorter = lvwColumnSorter;
+            listView1.FullRowSelect = true;
 
         }
 
@@ -292,23 +293,8 @@ namespace Hector
                 if (ResultArticle != null)
                 {
 
-                    // A ENLEVER !!!! TEST POUR PAGE D'AJOUT/MODIF
-                    FormAjouterModifierArticle ImportDialog = 
-                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle[20]);
-
-                    // Affichage de la fenetre Importer
-
-
-                    if (ImportDialog.ShowDialog(this) == DialogResult.OK)
-                    {
-                        // Suppression de la fenetre Importer
-
-                        this.RefreshTree();
-
-                        ImportDialog.Dispose();
-                    }
-
-                    // FIN TEST
+                    
+                    
 
                     foreach (var Article in ResultArticle)
                     {
@@ -561,6 +547,29 @@ namespace Hector
             if(e.KeyCode == Keys.F5)
             {
                 AllRefresh();
+            }
+        }
+
+        private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if (e.IsSelected)
+            {
+                FormAjouterModifierArticle ImportDialog =
+                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == e.Item.Text));
+
+                // Affichage de la fenetre Importer
+
+
+                if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Suppression de la fenetre Importer
+
+                    this.RefreshTree();
+
+                    ImportDialog.Dispose();
+                }
+
+                // FIN TEST
             }
         }
     }
