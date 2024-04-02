@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hector.Modele
 {
-    class Marque
+    public class Marque
     {
 
         public Marque(int refMarque, string nomMarque)

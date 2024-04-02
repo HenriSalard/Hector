@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hector.Modele
 {
-    class SousFamille
+    public class SousFamille
     {
 
         public SousFamille(int refSousFamille, int refFamille, string nomSousFamille)

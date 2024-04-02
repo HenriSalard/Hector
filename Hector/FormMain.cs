@@ -291,6 +291,25 @@ namespace Hector
                 );
                 if (ResultArticle != null)
                 {
+
+                    // A ENLEVER !!!! TEST POUR PAGE D'AJOUT/MODIF
+                    FormAjouterModifierArticle ImportDialog = 
+                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle[20]);
+
+                    // Affichage de la fenetre Importer
+
+
+                    if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+                    {
+                        // Suppression de la fenetre Importer
+
+                        this.RefreshTree();
+
+                        ImportDialog.Dispose();
+                    }
+
+                    // FIN TEST
+
                     foreach (var Article in ResultArticle)
                     {
                         Array[1] = Article.Description;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hector.Modele
 {
-    class Article
+    public class Article
     {
         
 
@@ -28,8 +28,5 @@ namespace Hector.Modele
             this.Quantite = Quantite;
 
         }
-
-
-
     }
 }

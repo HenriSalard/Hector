@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hector
 {
-    class Famille
+    public class Famille
     {
 
         public Famille(int refFamille, string nomFamille)
