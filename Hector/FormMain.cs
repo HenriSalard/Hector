@@ -548,14 +548,12 @@ namespace Hector
             {
                 AllRefresh();
             }
-        }
-
-        private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
-        {
-            if (e.IsSelected)
+            if(e.KeyCode == Keys.Space || e.KeyCode == Keys.Enter)
             {
+                ListViewItem Item = listView1.SelectedItems[0];
+
                 FormAjouterModifierArticle ImportDialog =
-                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == e.Item.Text));
+                            new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
 
                 // Affichage de la fenetre Importer
 
@@ -568,8 +566,44 @@ namespace Hector
 
                     ImportDialog.Dispose();
                 }
+            }
+            if(e.KeyCode == Keys.Delete)
+            {
+                //Dialogue de suppresion
 
-                // FIN TEST
+            }
+        }
+        
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            ListViewItem Item = listView1.SelectedItems[0];
+
+            FormAjouterModifierArticle ImportDialog =
+                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
+
+            // Affichage de la fenetre Importer
+
+
+            if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                // Suppression de la fenetre Importer
+
+                this.RefreshTree();
+
+                ImportDialog.Dispose();
+            }
+        }
+
+        private void listView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            Control c = sender as Control;
+
+            if (e.Button == MouseButtons.Right)
+            {                
+                supprimerToolStripMenuItem.Enabled = false;
+                modifierToolStripMenuItem.Enabled = false;                
+                contextMenuStrip1.Show(c, e.Location);
             }
         }
     }
