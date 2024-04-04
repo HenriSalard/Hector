@@ -601,10 +601,52 @@ namespace Hector
 
             if (e.Button == MouseButtons.Right)
             {                
-                supprimerToolStripMenuItem.Enabled = false;
-                modifierToolStripMenuItem.Enabled = false;                
+                supprimerToolStripMenuItem.Enabled = true;
+                modifierToolStripMenuItem.Enabled = true;                
                 contextMenuStrip1.Show(c, e.Location);
             }
+        }
+
+        private void modifierToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListViewItem Item = listView1.SelectedItems[0];
+
+            FormAjouterModifierArticle ImportDialog =
+                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
+
+            // Affichage de la fenetre Importer
+
+
+            if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                // Suppression de la fenetre Importer
+
+                this.RefreshTree();
+
+                ImportDialog.Dispose();
+            }
+        }
+
+        private void ajouterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            ListViewItem Item = listView1.SelectedItems[0];
+
+            FormAjouterModifierArticle ImportDialog =
+                        new FormAjouterModifierArticle(true, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
+
+            // Affichage de la fenetre Importer
+
+
+            if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                // Suppression de la fenetre Importer
+
+                this.RefreshTree();
+
+                ImportDialog.Dispose();
+            }
+
         }
     }
 
