@@ -64,6 +64,11 @@ namespace Hector
             }
         }
 
+        /// <summary>
+        /// Gere l'importation du csv et la mise à jour de la base en mode ecrasement
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonEcrasement_Click(object sender, EventArgs e)
         {
             //Trouve le chemin vers le fichier de la bdd
@@ -208,28 +213,13 @@ namespace Hector
                         {
                             ArticleExiste = true;
 
-                            // Si c'est le cas on verifie la conformite des infos
-                            if (ListeArticles[IndiceArticle].Description != Description)
-                            {
-                                ListeArticles[IndiceArticle].Description = Description; // On met a jour la description
-                            }
-
-                            if (ListeArticles[IndiceArticle].RefSousFamille != RefSousFamille)
-                            {
-                                ListeArticles[IndiceArticle].RefSousFamille = RefSousFamille; // On met a jour la sous famille
-                            }
-
-                            if (ListeArticles[IndiceArticle].PrixHT != PrixHT)
-                            {
-                                ListeArticles[IndiceArticle].PrixHT = PrixHT; // On met a jour le prix
-                            }
-
-                            // On met aussi a jour la bdd, ici ca servira que si un article apparait plusieurs fois dans le csv
+                            // On met a jour la bdd, ici ca servira que si un article apparait plusieurs fois dans le csv
                             CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + Description + "', RefSousFamille = '" + RefSousFamille + "'," +
-                                " PrixHT = '" + ListeArticles[IndiceArticle].PrixHT + "'";
+                                " PrixHT = '" + PrixHT + "', RefMarque = '" + RefMarque + "' WHERE RefArticle = '" + RefArticle + "'";
                             CommandeInsert.ExecuteNonQuery();
                         }
                     }
+
                     if (!ArticleExiste)
                     {
                         // s'il n'existe pas on le cree puis on l'ajoute dans la bdd
@@ -391,25 +381,9 @@ namespace Hector
                         {
                             ArticleExiste = true;
 
-                            // Si c'est le cas on verifie la conformite des infos
-                            if (ListeArticles[IndiceArticle].Description != Description)
-                            {
-                                ListeArticles[IndiceArticle].Description = Description; // On met a jour la description
-                            }
-
-                            if (ListeArticles[IndiceArticle].RefSousFamille != RefSousFamille)
-                            {
-                                ListeArticles[IndiceArticle].RefSousFamille = RefSousFamille; // On met a jour la sous famille
-                            }
-
-                            if (ListeArticles[IndiceArticle].PrixHT != PrixHT)
-                            {
-                                ListeArticles[IndiceArticle].PrixHT = PrixHT; // On met a jour le prix
-                            }
-
-                            // On met aussi a jour la bdd, ici ca servira que si un article apparait plusieurs fois dans le csv
+                            // On met a jour la bdd, ici ca servira que si un article apparait plusieurs fois dans le csv
                             CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + Description + "', RefSousFamille = '" + RefSousFamille + "'," +
-                                " PrixHT = '" + ListeArticles[IndiceArticle].PrixHT + "'";
+                                " PrixHT = '" + PrixHT + "', RefMarque = '" + RefMarque + "' WHERE RefArticle = '" + RefArticle + "'";
                             CommandeInsert.ExecuteNonQuery();
                         }
                     }
@@ -445,6 +419,12 @@ namespace Hector
 
         }
 
+        /// <summary>
+        /// Retourne la reference d'une famille en fonction de son nom
+        /// </summary>
+        /// <param name="NomDeLaFamille">Nom de la famille dont on veut connaitre la reference </param>
+        /// <param name="ListeFamilles">La liste des familles de notre base</param>
+        /// <returns></returns>
         private static int TrouverRefFamille(string NomDeLaFamille, List<Famille> ListeFamilles)
         {
             foreach (Famille FamilleAComparer in ListeFamilles)
@@ -457,6 +437,12 @@ namespace Hector
             return -1;
         }
 
+        /// <summary>
+        /// Retourne la reference d'une sous famille en fonction de son nom
+        /// </summary>
+        /// <param name="NomDeLaFamille"> Nom de la famille dont on veut connaitre la reference </param>
+        /// <param name="ListeSousFamilles"> La liste des sous familles de notre base </param>
+        /// <returns></returns>
         private static int TrouverRefSousFamille(string NomDeLaFamille, List<SousFamille> ListeSousFamilles)
         {
             foreach (SousFamille SousFamilleAComparer in ListeSousFamilles)
