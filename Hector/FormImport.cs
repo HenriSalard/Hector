@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -215,7 +216,7 @@ namespace Hector
 
                             // On met a jour la bdd, ici ca servira que si un article apparait plusieurs fois dans le csv
                             CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + Description + "', RefSousFamille = '" + RefSousFamille + "'," +
-                                " PrixHT = '" + PrixHT + "', RefMarque = '" + RefMarque + "' WHERE RefArticle = '" + RefArticle + "'";
+                                " PrixHT = '" + PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', RefMarque = '" + RefMarque + "' WHERE RefArticle = '" + RefArticle + "'";
                             CommandeInsert.ExecuteNonQuery();
                         }
                     }
@@ -227,7 +228,7 @@ namespace Hector
                         ListeArticles.Add(NouvelArticle);
                         CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
                             + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
-                             + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
+                             + "', '" + NouvelArticle.PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', '" + NouvelArticle.Quantite + "')";
                         CommandeInsert.ExecuteNonQuery();
 
                         ArticleAjoutes++;
@@ -383,7 +384,7 @@ namespace Hector
 
                             // On met a jour la bdd, ici ca servira que si un article apparait plusieurs fois dans le csv
                             CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + Description + "', RefSousFamille = '" + RefSousFamille + "'," +
-                                " PrixHT = '" + PrixHT + "', RefMarque = '" + RefMarque + "' WHERE RefArticle = '" + RefArticle + "'";
+                                " PrixHT = '" + PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', RefMarque = '" + RefMarque + "' WHERE RefArticle = '" + RefArticle + "'";
                             CommandeInsert.ExecuteNonQuery();
                         }
                     }
@@ -394,7 +395,7 @@ namespace Hector
                         ListeArticles.Add(NouvelArticle);
                         CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
                             + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
-                             + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
+                             + "', '" + NouvelArticle.PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', '" + NouvelArticle.Quantite + "')";
                         CommandeInsert.ExecuteNonQuery();
 
                         ArticleAjoutes++;
