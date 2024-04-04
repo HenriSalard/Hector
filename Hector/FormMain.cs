@@ -166,6 +166,7 @@ namespace Hector
             listView1.Columns[3].Width = 0;
             listView1.Columns[4].Width = 0;
             listView1.Columns[5].Width = 0;
+            listView1.Columns[6].Width = 0;
         }
 
         protected void ShowColumns()
@@ -176,6 +177,7 @@ namespace Hector
             listView1.Columns[3].Width = -2;
             listView1.Columns[4].Width = -2;
             listView1.Columns[5].Width = -2;
+            listView1.Columns[6].Width = -2;
 
         }
 
@@ -192,7 +194,7 @@ namespace Hector
 
                 ListViewItem Item;
 
-                string[] Array = new string[6];
+                string[] Array = new string[7];
 
                 foreach (var Article in ListArticle)
                 {
@@ -205,6 +207,7 @@ namespace Hector
                     Marque Marque = ListMarque[Article.RefMarque - 1];
                     Array[4] = Marque.NomMarque;
                     Array[5] = Article.Quantite.ToString();
+                    Array[6] = Article.PrixHT.ToString();
 
                     Item = new ListViewItem(Array);
                     this.listView1.Items.Add(Item);
@@ -217,7 +220,7 @@ namespace Hector
             {
                 HideColumns();
 
-                string[] Array = new string[6];
+                string[] Array = new string[7];
 
                 ListViewItem Item;
 
@@ -233,7 +236,7 @@ namespace Hector
             {
                 HideColumns();
 
-                string[] Array = new string[6];
+                string[] Array = new string[7];
 
                 ListViewItem Item;
 
@@ -262,7 +265,7 @@ namespace Hector
 
                 HideColumns();
 
-                string[] Array = new string[6];
+                string[] Array = new string[7];
 
                 ListViewItem Item;
 
@@ -282,7 +285,7 @@ namespace Hector
 
                 ListViewItem Item;
 
-                string[] Array = new string[6];
+                string[] Array = new string[7];
 
                 List<Article> ResultArticle = ListArticle.FindAll(
                     delegate (Article Article)
@@ -307,6 +310,7 @@ namespace Hector
                         Marque Marque = ListMarque[Article.RefMarque - 1];
                         Array[4] = Marque.NomMarque;
                         Array[5] = Article.Quantite.ToString();
+                        Array[6] = Article.PrixHT.ToString();
 
                         Item = new ListViewItem(Array);
                         this.listView1.Items.Add(Item);
@@ -321,7 +325,7 @@ namespace Hector
 
                 ListViewItem Item;
 
-                string[] Array = new string[6];
+                string[] Array = new string[7];
 
                 List<Article> ResultArticle = ListArticle.FindAll(
                     delegate (Article Article)
@@ -342,6 +346,7 @@ namespace Hector
                         Marque Marque = ListMarque[Article.RefMarque - 1];
                         Array[4] = Marque.NomMarque;
                         Array[5] = Article.Quantite.ToString();
+                        Array[6] = Article.PrixHT.ToString();
 
                         Item = new ListViewItem(Array);
                         this.listView1.Items.Add(Item);
@@ -647,6 +652,40 @@ namespace Hector
                 ImportDialog.Dispose();
             }
 
+        }
+
+        private void FormMain_MouseClick(object sender, MouseEventArgs e)
+        {
+            Control c = sender as Control;
+
+            if (e.Button == MouseButtons.Right)
+            {
+                supprimerToolStripMenuItem.Enabled = false;
+                modifierToolStripMenuItem.Enabled = false;
+                contextMenuStrip1.Show(c, e.Location);
+            }
+        }
+
+        private void supprimerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            const string message = "Etes vous sûr de supprimer cet ligne?\nCette action est irrévocable.";
+            const string caption = "Supprimer élément";
+            var result = MessageBox.Show(message, caption,
+                                         MessageBoxButtons.OKCancel,
+                                         MessageBoxIcon.Warning);
+
+            
+            if (result == DialogResult.Yes)
+            {
+                // TODO Mettre code pour supprimer élément
+
+
+
+
+
+
+
+            }
         }
     }
 
