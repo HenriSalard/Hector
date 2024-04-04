@@ -90,7 +90,7 @@ namespace Hector
             this.ComboBoxFamille.Location = new System.Drawing.Point(156, 263);
             this.ComboBoxFamille.Name = "ComboBoxFamille";
             this.ComboBoxFamille.Size = new System.Drawing.Size(191, 24);
-            this.ComboBoxFamille.TabIndex = 4;
+            this.ComboBoxFamille.TabIndex = 5;
             // 
             // LabelMarque
             // 
@@ -125,7 +125,7 @@ namespace Hector
             this.ComboBoxSousFamille.Location = new System.Drawing.Point(156, 311);
             this.ComboBoxSousFamille.Name = "ComboBoxSousFamille";
             this.ComboBoxSousFamille.Size = new System.Drawing.Size(191, 24);
-            this.ComboBoxSousFamille.TabIndex = 8;
+            this.ComboBoxSousFamille.TabIndex = 6;
             // 
             // ComboBoxMarque
             // 
@@ -133,21 +133,21 @@ namespace Hector
             this.ComboBoxMarque.Location = new System.Drawing.Point(156, 218);
             this.ComboBoxMarque.Name = "ComboBoxMarque";
             this.ComboBoxMarque.Size = new System.Drawing.Size(191, 24);
-            this.ComboBoxMarque.TabIndex = 9;
+            this.ComboBoxMarque.TabIndex = 4;
             // 
             // TextBoxRef
             // 
             this.TextBoxRef.Location = new System.Drawing.Point(156, 67);
             this.TextBoxRef.Name = "TextBoxRef";
             this.TextBoxRef.Size = new System.Drawing.Size(121, 22);
-            this.TextBoxRef.TabIndex = 10;
+            this.TextBoxRef.TabIndex = 1;
             // 
             // TextBoxPrix
             // 
             this.TextBoxPrix.Location = new System.Drawing.Point(156, 175);
             this.TextBoxPrix.Name = "TextBoxPrix";
             this.TextBoxPrix.Size = new System.Drawing.Size(121, 22);
-            this.TextBoxPrix.TabIndex = 11;
+            this.TextBoxPrix.TabIndex = 3;
             // 
             // TextBoxDescription
             // 
@@ -155,7 +155,7 @@ namespace Hector
             this.TextBoxDescription.Multiline = true;
             this.TextBoxDescription.Name = "TextBoxDescription";
             this.TextBoxDescription.Size = new System.Drawing.Size(250, 39);
-            this.TextBoxDescription.TabIndex = 12;
+            this.TextBoxDescription.TabIndex = 2;
             // 
             // label2
             // 
@@ -171,7 +171,7 @@ namespace Hector
             this.TextBoxQuantite.Location = new System.Drawing.Point(156, 361);
             this.TextBoxQuantite.Name = "TextBoxQuantite";
             this.TextBoxQuantite.Size = new System.Drawing.Size(100, 22);
-            this.TextBoxQuantite.TabIndex = 14;
+            this.TextBoxQuantite.TabIndex = 7;
             // 
             // button1
             // 

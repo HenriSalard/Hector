@@ -206,7 +206,22 @@ namespace Hector
             if (!EstAjouter)
             {
                 ArticleAModifier.Description = TextBoxDescription.Text;
-                //fArticleAModifier.PrixHT = TextBoxPrix.Text
+                ArticleAModifier.PrixHT = float.Parse(TextBoxPrix.Text);
+                ArticleAModifier.Quantite = int.Parse(TextBoxQuantite.Text);
+                ArticleAModifier.RefMarque = ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque;
+                ArticleAModifier.RefSousFamille = ListeSousFamilles[ComboBoxSousFamille.SelectedIndex].RefSousFamille;
+
+                //Trouve le chemin vers le fichier de la bdd
+                SQLiteConnection con = new SQLiteConnection("URI=file:"
+                    + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                    + "\\Hector.sqlite");
+
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, con); // Definition de la commande a utiliser pour modifier la bdd
+
+                CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + ArticleAModifier.Description + "', RefSousFamille = '" + ArticleAModifier.RefSousFamille + "'," +
+                    " PrixHT = '" + ArticleAModifier.PrixHT + "', RefMarque = '" + ArticleAModifier.RefMarque + "' WHERE RefArticle = '" + ArticleAModifier.RefArticle + "'";
+                
+                CommandeInsert.ExecuteNonQuery();
             }
             
 
