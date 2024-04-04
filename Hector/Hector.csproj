@@ -65,6 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSVLecteur.cs" />
+    <Compile Include="FormAjouterModifierMarqueFamille.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormAjouterModifierMarqueFamille.Designer.cs">
+      <DependentUpon>FormAjouterModifierMarqueFamille.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAjouterModifierArticle.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -96,6 +102,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modele\SousFamille.cs" />
+    <EmbeddedResource Include="FormAjouterModifierMarqueFamille.resx">
+      <DependentUpon>FormAjouterModifierMarqueFamille.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormAjouterModifierArticle.resx">
       <DependentUpon>FormAjouterModifierArticle.cs</DependentUpon>
     </EmbeddedResource>

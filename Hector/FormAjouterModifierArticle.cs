@@ -40,6 +40,16 @@ namespace Hector
         private void FormAjouterModifier_Load(object sender, EventArgs e)
         {
 
+            if (EstAjouter)
+            {
+                label1.Text = "Creer un article";
+            }
+
+            else
+            {
+                label1.Text = "Modifier un article";
+            }
+
             // On met les familles dans le ComboBox
             ComboBoxFamille.DataSource = ListeFamilles;
 
@@ -112,7 +122,6 @@ namespace Hector
 
         }
 
-
         /// <summary>
         /// Verifie la validité des données saisies. Puis met à jour l'article dans l'application et la base de données
         /// </summary>
@@ -167,7 +176,7 @@ namespace Hector
             // Verrification que la quantite est un int
             if (!int.TryParse(TextBoxQuantite.Text, out int resultatquantite))
             {
-                string Message = "Erreur! Prix incorrect! (format: 20.5)";
+                string Message = "Erreur! Prix incorrect! (format: 20,5)";
                 MessageBox.Show(this, Message, "Erreur");
                 return;
             }
@@ -203,6 +212,15 @@ namespace Hector
             }
 
             // Une fois les verifications faites on peut mettre a jour l'article
+
+            //Trouve le chemin vers le fichier de la bdd
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            // Cas modification
             if (!EstAjouter)
             {
                 ArticleAModifier.Description = TextBoxDescription.Text;
@@ -211,27 +229,58 @@ namespace Hector
                 ArticleAModifier.RefMarque = ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque;
                 ArticleAModifier.RefSousFamille = ListeSousFamilles[ComboBoxSousFamille.SelectedIndex].RefSousFamille;
 
-                //Trouve le chemin vers le fichier de la bdd
-                SQLiteConnection con = new SQLiteConnection("URI=file:"
-                    + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
-                    + "\\Hector.sqlite");
-
-                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, con); // Definition de la commande a utiliser pour modifier la bdd
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
 
                 CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + ArticleAModifier.Description + "', RefSousFamille = '" + ArticleAModifier.RefSousFamille + "'," +
                     " PrixHT = '" + ArticleAModifier.PrixHT + "', RefMarque = '" + ArticleAModifier.RefMarque + "' WHERE RefArticle = '" + ArticleAModifier.RefArticle + "'";
                 
                 CommandeInsert.ExecuteNonQuery();
+
+                Con.Close();
+
+                // Affichage d'une confirmation de la modification
+
+                DialogResult result;
+
+                result = MessageBox.Show(this, "La modification a bien été prise en compte.", "Importation terminée", MessageBoxButtons.OK);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    // ferme la fenetre et continue l'execution de formMain
+                    this.DialogResult = DialogResult.OK;
+                }
             }
-            
 
+            // Cas ajout
+            else
+            {
+                Article NouvelArticle = new Article(TextBoxRef.Text, ListeSousFamilles[ComboBoxSousFamille.SelectedIndex].RefSousFamille, ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque,
+                    TextBoxDescription.Text, float.Parse(TextBoxPrix.Text), int.Parse(TextBoxQuantite.Text));
 
-            //Trouve le chemin vers le fichier de la bdd
-            SQLiteConnection Con = new SQLiteConnection("URI=file:"
-                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
-                + "\\Hector.sqlite");
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
 
-            Con.Open();
+                CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
+                    + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
+                     + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
+                CommandeInsert.ExecuteNonQuery();
+
+                Con.Close();
+
+                // Affichage d'une confirmation de l'ajout
+
+                DialogResult result;
+
+                result = MessageBox.Show(this, "L'article a bien été ajouté.", "Ajout terminé", MessageBoxButtons.OK);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    // ferme la fenetre et continue l'execution de formMain
+                    this.DialogResult = DialogResult.OK;
+                }
+            }
+        }
+
+        private void ComboBoxFamille_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
