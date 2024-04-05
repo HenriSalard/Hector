@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -31,7 +30,17 @@ namespace Hector
         SousFamille SousFamilleAModifier;
 
 
-
+        /// <summary>
+        /// Constructeur de la pfenetre d'ajout/modification d'une marque/famille/sous famille
+        /// </summary>
+        /// <param name="Ajouter"> Bool : Dit si on c'est une fenetre d'ajout ou de modification</param>
+        /// <param name="Type"> String : "Marque" ou "Famille" ou "SousFamille" , donne le type d'element à modifier</param>
+        /// <param name="ListeFamilles"> La liste de toutes les familles </param>
+        /// <param name="ListeSousFamilles"> La liste de toutes les sous familles </param>
+        /// <param name="ListeMarques">La liste de toutes les marques</param>
+        /// <param name="MarqueAModifier">La marque a modifier, null par defaut</param>
+        /// <param name="FamilleAModifier">La famille a modifier, null par defaut</param>
+        /// <param name="SousFamilleAModifier">La sous famille a modifier, null par defaut</param>
         public FormAjouterModifierMarqueFamille(bool Ajouter, string Type, List<Famille> ListeFamilles, List<SousFamille> ListeSousFamilles, List<Marque> ListeMarques,
             Marque MarqueAModifier = null, Famille FamilleAModifier=null, SousFamille SousFamilleAModifier = null)
         {
@@ -155,6 +164,8 @@ namespace Hector
 
                     if (TypeDePage == "Marque")
                     {
+                        // Creation de la marque a ajouter qui sera renvoyé à formMain
+                        MarqueAModifier = new Marque(ListeMarques.Count + 1, textBox1.Text);
 
                         // Ajout de la marque à la bdd
                         CommandeInsert.CommandText = "INSERT INTO Marques(RefMarque, Nom) Values('" + ListeMarques.Count + 1 + "', '" + textBox1.Text + "')";
@@ -164,6 +175,8 @@ namespace Hector
 
                     if(TypeDePage == "Famille")
                     {
+                        // Creation de la famille a ajouter qui sera renvoyé à formMain
+                        FamilleAModifier = new Famille(ListeFamilles.Count + 1, textBox1.Text);
 
                         // Ajout de la famille a la bdd
                         CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + ListeFamilles.Count + 1 + "', '" + textBox1.Text + "' )";
@@ -172,7 +185,9 @@ namespace Hector
 
                     if (TypeDePage == "SousFamille")
                     {
-                        
+                        // Creation de la sous famille qui sera renvoyé à formMain
+                        SousFamilleAModifier = new SousFamille(ListeSousFamilles.Count + 1, ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille, textBox1.Text);
+
                         // Ajout de la sous famille à la bdd
                         CommandeInsert.CommandText = "INSERT INTO SousFamilles(RefSousFamille, RefFamille, Nom) VALUES( '"
                         + ListeSousFamilles.Count + 1 + "', '" + ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille + "', '" + textBox1.Text + "' )";
@@ -241,6 +256,22 @@ namespace Hector
             }
 
         }
+
+        public Famille GetFamille()
+        {
+            return FamilleAModifier;
+        }
+
+        public SousFamille GetSousFamille()
+        {
+            return SousFamilleAModifier;
+        }
+
+        public Marque GetMarque()
+        {
+            return MarqueAModifier;
+        }
+
 
         private void label2_Click(object sender, EventArgs e)
         {
