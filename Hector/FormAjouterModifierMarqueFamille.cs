@@ -143,14 +143,23 @@ namespace Hector
 
                     label3.Visible = false;
                 }
+
                 if(TypeDePage == "SousFamille")
                 {
                     label1.Text = "Modifier la sous-famille n°" + SousFamilleAModifier.RefSousFamille;
 
                     textBox1.Text = SousFamilleAModifier.NomSousFamille;
 
+                    ComboBoxFamille.Visible = true;
+
+                    // On met les familles dans le ComboBox
+                    ComboBoxFamille.DataSource = ListeFamilles;
+
+                    // Le comboBox affichera l'attribut nomFamille 
+                    ComboBoxFamille.DisplayMember = "NomFamille";
+
                     // On cherche la famille de la sousFamille a modifier et on place le comboBox dessus
-                    foreach(Famille Fam in ListeFamilles)
+                    foreach (Famille Fam in ListeFamilles)
                     {
                         if(Fam.RefFamille == SousFamilleAModifier.RefFamille)
                         {
@@ -190,36 +199,65 @@ namespace Hector
 
                     SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
 
+                    SQLiteCommand CommandeRead = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour lire les references
+
                     if (TypeDePage == "Marque")
                     {
-                        // Creation de la marque a ajouter qui sera renvoyé à formMain
-                        MarqueAModifier = new Marque(ListeMarques.Count + 1, textBox1.Text);
 
                         // Ajout de la marque à la bdd
-                        CommandeInsert.CommandText = "INSERT INTO Marques(RefMarque, Nom) Values('" + ListeMarques.Count + 1 + "', '" + textBox1.Text + "')";
+                        CommandeInsert.CommandText = "INSERT INTO Marques(Nom) Values('" +  textBox1.Text + "')";
 
                         CommandeInsert.ExecuteNonQuery();
+
+                        CommandeRead.CommandText = "SELECT RefMarque FROM Marques WHERE Nom = '" + textBox1.Text + "'";
+
+                        // On recupere la reference qui a été generée en auto increment
+                        SQLiteDataReader Lecteur = CommandeRead.ExecuteReader();
+
+                        Lecteur.Read();
+
+                        // Creation de la marque a ajouter qui sera renvoyé à formMain
+                        MarqueAModifier = new Marque(Lecteur.GetInt32(0), textBox1.Text);
+                        
                     }
 
                     if(TypeDePage == "Famille")
                     {
-                        // Creation de la famille a ajouter qui sera renvoyé à formMain
-                        FamilleAModifier = new Famille(ListeFamilles.Count + 1, textBox1.Text);
 
                         // Ajout de la famille a la bdd
-                        CommandeInsert.CommandText = "INSERT INTO Familles(RefFamille, Nom) VALUES( '" + ListeFamilles.Count + 1 + "', '" + textBox1.Text + "' )";
+                        CommandeInsert.CommandText = "INSERT INTO Familles(Nom) VALUES( '" + textBox1.Text + "' )";
                         CommandeInsert.ExecuteNonQuery();
+
+                        CommandeRead.CommandText = "SELECT RefFamille FROM Familles WHERE Nom = '" + textBox1.Text + "'";
+
+                        // On recupere la reference qui a été generée en auto increment
+                        SQLiteDataReader Lecteur = CommandeRead.ExecuteReader();
+
+                        Lecteur.Read();
+
+                        // Creation de la famille a ajouter qui sera renvoyé à formMain
+                        FamilleAModifier = new Famille(Lecteur.GetInt32(0), textBox1.Text);
+
                     }
 
                     if (TypeDePage == "SousFamille")
                     {
-                        // Creation de la sous famille qui sera renvoyé à formMain
-                        SousFamilleAModifier = new SousFamille(ListeSousFamilles.Count + 1, ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille, textBox1.Text);
 
                         // Ajout de la sous famille à la bdd
-                        CommandeInsert.CommandText = "INSERT INTO SousFamilles(RefSousFamille, RefFamille, Nom) VALUES( '"
-                        + ListeSousFamilles.Count + 1 + "', '" + ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille + "', '" + textBox1.Text + "' )";
+                        CommandeInsert.CommandText = "INSERT INTO SousFamilles(RefFamille, Nom) VALUES( '"
+                         + ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille + "', '" + textBox1.Text + "' )";
                         CommandeInsert.ExecuteNonQuery();
+
+                        CommandeRead.CommandText = "SELECT RefSousFamille FROM SousFamilles WHERE Nom = '" + textBox1.Text + "'";
+
+                        // On recupere la reference qui a été generée en auto increment
+                        SQLiteDataReader Lecteur = CommandeRead.ExecuteReader();
+
+                        Lecteur.Read();
+
+                        // Creation de la famille a ajouter qui sera renvoyé à formMain
+                        SousFamilleAModifier = new SousFamille(Lecteur.GetInt32(0), ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille, textBox1.Text);
+
                     }
 
                     Con.Close();

@@ -39,13 +39,6 @@ namespace Hector
             Con.Close();
         }
 
-
-
-
-
-
-
-
         public FormMain()
         {
             InitializeComponent();
@@ -64,6 +57,8 @@ namespace Hector
             if (ImportDialog.ShowDialog(this) == DialogResult.OK)
             {
                 // Suppression de la fenetre Importer
+
+                this.AllRefresh();
 
                 this.RefreshTree();
 
@@ -293,9 +288,6 @@ namespace Hector
                 );
                 if (ResultArticle != null)
                 {
-
-                    
-                    
 
                     foreach (var Article in ResultArticle)
                     {
@@ -615,6 +607,8 @@ namespace Hector
                 {
                     // Modification de la famille dans la liste
 
+                    ListFamille.Remove(Fam);
+
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
                     FamMarqueDialog.Dispose();
@@ -631,7 +625,9 @@ namespace Hector
                 {
                     // Modification de la marque dans la liste
 
-                    ListFamille.Add(FamMarqueDialog.GetFamille());
+                    ListMarque.Remove(ListMarque.Find(x => x.NomMarque.ToString() == Item.SubItems[1].Text));
+
+                    ListMarque.Add(FamMarqueDialog.GetMarque());
 
                     FamMarqueDialog.Dispose();
 
@@ -650,6 +646,8 @@ namespace Hector
                 {
                     // Modification de l'article dans la liste
 
+                    ListArticle.Remove(ListArticle.Find(x => x.RefArticle == Item.Text));
+
                     ListArticle.Add(ImportDialog.GetArticle());
 
                     ImportDialog.Dispose();
@@ -666,13 +664,16 @@ namespace Hector
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
                     // Modification de la sous-famille dans la liste
+                    ListSousFamille.Remove(ListSousFamille.Find(x => x.NomSousFamille == Item.SubItems[1].Text));
 
-                    ListFamille.Add(FamMarqueDialog.GetFamille());
+                    ListSousFamille.Add(FamMarqueDialog.GetSousFamille());
 
                     FamMarqueDialog.Dispose();
 
+                    this.RefreshTree();
+
                     // Suppression de la fenetre Importer
-                    this.RefreshListArticle("NoeudFamille", null);
+                    this.RefreshListArticle("NoeudSousFamille", null);
                 }
             }
 
@@ -742,12 +743,12 @@ namespace Hector
                 {
                     // Ajout de la sous-famille dans la liste
 
-                    ListFamille.Add(FamMarqueDialog.GetFamille());
+                    ListSousFamille.Add(FamMarqueDialog.GetSousFamille());
 
                     FamMarqueDialog.Dispose();
 
                     // Suppression de la fenetre Importer
-                    this.RefreshListArticle("NoeudFamille", null);
+                    this.RefreshListArticle("NoeudSousFamille", null);
                 }
             }
             
