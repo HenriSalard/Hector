@@ -613,7 +613,7 @@ namespace Hector
 
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Modification de la famille dans la liste
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
@@ -629,7 +629,7 @@ namespace Hector
 
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Modification de la marque dans la liste
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
@@ -648,11 +648,12 @@ namespace Hector
 
                 if (ImportDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Modification de l'article dans la liste
 
                     ListArticle.Add(ImportDialog.GetArticle());
 
                     ImportDialog.Dispose();
+
 
                     // Suppression de la fenetre Importer
                     this.RefreshListArticle("NoeudArticle", null);
@@ -664,7 +665,7 @@ namespace Hector
 
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Modification de la sous-famille dans la liste
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
@@ -688,7 +689,7 @@ namespace Hector
 
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Ajout de la famille dans la liste
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
@@ -704,7 +705,7 @@ namespace Hector
 
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Ajout de la marque dans la liste
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
@@ -739,7 +740,7 @@ namespace Hector
 
                 if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    // Ajout de l'article dans la liste
+                    // Ajout de la sous-famille dans la liste
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
@@ -805,6 +806,8 @@ namespace Hector
 
             int Count = Lecteur.GetInt32(0);
 
+            Lecteur.Close();
+
             if (Count != 0)
             {
                 const string message = "Impossible de supprimer cet élement";
@@ -821,13 +824,15 @@ namespace Hector
 
                 CommandeInsert.ExecuteNonQuery();
 
-                ListFamille.Remove(Famille);
+                
 
-                this.RefreshTree();
+                ListFamille.Remove(Famille);
 
                 this.RefreshListArticle("NoeudFamille", null);
 
             }
+
+            Con.Close();
         }
 
         private void Supprimer_SousFamille(SousFamille SousFamille)
@@ -864,11 +869,11 @@ namespace Hector
 
                 ListSousFamille.Remove(SousFamille);
 
-                this.RefreshTree();
-
                 this.RefreshListArticle("NoeudFamille", null);
 
             }
+
+            Con.Close();
         }
 
         private void Supprimer_Marque(Marque Marque)
@@ -905,11 +910,11 @@ namespace Hector
 
                 ListMarque.Remove(Marque);
 
-                this.RefreshTree();
-
                 this.RefreshListArticle("NoeudMarque", null);
 
             }
+
+            Con.Close();
             
         }
 
@@ -930,8 +935,6 @@ namespace Hector
             Con.Close();
 
             ListArticle.Remove(Article);
-
-            this.RefreshTree();
 
             this.RefreshListArticle("NoeudArticle", null);
         }
