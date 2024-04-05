@@ -14,6 +14,10 @@ using System.Windows.Forms;
 
 namespace Hector
 {
+
+    /// <summary>
+    /// Fenetre d'importation de csv
+    /// </summary>
     public partial class FormImport : Form
     {
 
@@ -21,6 +25,10 @@ namespace Hector
         private int ArticleAjoutes;
         private int NbAnomalies;
 
+        /// <summary>
+        /// Instancie une nouvelle instance de l'objet <b>FormImport</b>
+        /// Met le label fileName à vide car aucun csv n'est selectionné au debut
+        /// </summary>
         public FormImport()
         {
             InitializeComponent();
@@ -29,19 +37,34 @@ namespace Hector
             // On initialise le texte du nom du fichier à vide 
 
             this.LabelFileName.Text = "";
+
             this.FilePath = string.Empty;
+
             this.ArticleAjoutes = 0;
+
             this.NbAnomalies = 0;
+
             this.progressBar1.Minimum = 1;
         }
 
+        /// <summary>
+        /// Charge la fenetre. Au debut on met juste les boutons en disabled
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormImport_Load(object sender, EventArgs e)
         {
             // On cache les boutons tant qu'aucun fichier n'est selectionné
             this.ButtonEcrasement.Enabled = false;
+
             this.ButtonAjout.Enabled = false;
         }
 
+        /// <summary>
+        /// Lance la selection du csv a importer via un FileDialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             var FileContent = string.Empty;
@@ -49,8 +72,11 @@ namespace Hector
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = "c:\\";
+
                 openFileDialog.Filter = "csv files (*.csv)|*.csv";
+
                 openFileDialog.FilterIndex = 2;
+
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -60,13 +86,14 @@ namespace Hector
                     LabelFileName.Text = Path.GetFileName(this.FilePath);
 
                     ButtonAjout.Enabled = true;
+
                     ButtonEcrasement.Enabled = true;
                 }
             }
         }
 
         /// <summary>
-        /// Gere l'importation du csv et la mise à jour de la base en mode ecrasement
+        /// Gere l'importation du csv et la mise à jour de la base en mode ecrasement, donc on supprime l'ancien contenu
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -85,6 +112,7 @@ namespace Hector
             // On compte le nombre de lignes du csv pour definir la barre de progression
 
             int NbLignes = 0;
+
             ArticleAjoutes = 0;
 
             while (Reader.ReadLine() != null)
@@ -96,6 +124,7 @@ namespace Hector
             Reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
             progressBar1.Maximum = NbLignes + 1; // Le remplissage de la barre est proportionnel au nombre d'articles a ajouter
+
             progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
 
             // On vide chaque table de la base de donnees
@@ -160,11 +189,14 @@ namespace Hector
                     // En premier on verifie si la famille existe
                     // TrouverRefFamille retourne la ref de la famille, ou -1 si cette famille n'existe pas encore
                     RefFamille = TrouverRefFamille(StringFamille, ListeFamilles);
+
                     if (RefFamille == -1)
                     {
                         // On cree la nouvelle famille et on l'ajoute a la liste, sa reference est egale au nombre de familles existantes + 1 (auto increment)
                         Famille NouvelleFamille = new Famille(ListeFamilles.Count + 1, StringFamille);
+
                         ListeFamilles.Add(NouvelleFamille);
+
                         RefFamille = NouvelleFamille.RefFamille;
 
                         // On peut ajouter la famille a la bdd
@@ -182,6 +214,7 @@ namespace Hector
                         // Sa cle etrangere RefFamille a ete trouvee a l'etape precedente
                         SousFamille NouvelleSousFamille = new SousFamille(ListeSousFamilles.Count + 1, RefFamille, StringSousFamille);
                         ListeSousFamilles.Add(NouvelleSousFamille);
+
                         RefSousFamille = NouvelleSousFamille.RefSousFamille;
 
                         // On peut ajouter la sous famille a la bdd
@@ -194,12 +227,15 @@ namespace Hector
                     // Ensuite on verifie si la marque existe
                     // TrouverRefMarque retourne la ref de la marque, ou -1 si cette sous marque n'existe pas encore
                     RefMarque = TrouverRefMarque(StringMarque, ListeMarques);
+
                     if (RefMarque == -1)
                     {
 
                         // On cree la nouvelle marque et on l'ajoute a la liste, sa reference est egale au nombre de marques existantes + 1 (auto increment)
                         Marque NouvelleMarque = new Marque(ListeMarques.Count + 1, StringMarque);
+
                         ListeMarques.Add(NouvelleMarque);
+
                         RefMarque = NouvelleMarque.RefMarque;
 
                         // On peut ajouter la sous marque a la bdd
@@ -225,7 +261,9 @@ namespace Hector
                     {
                         // s'il n'existe pas on le cree puis on l'ajoute dans la bdd
                         Article NouvelArticle = new Article(RefArticle, RefSousFamille, RefMarque, Description, PrixHT, 1);
+
                         ListeArticles.Add(NouvelArticle);
+
                         CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
                             + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
                              + "', '" + NouvelArticle.PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', '" + NouvelArticle.Quantite + "')";
@@ -241,10 +279,13 @@ namespace Hector
 
             // Affichage de la fenetre resultat a la fin
             MessageBoxButtons buttons = MessageBoxButtons.OK;
+
             DialogResult result;
+
             string Message = "Importation terminée \n " + ArticleAjoutes + " articles ajoutés \n" + NbAnomalies + " anomalies trouvées.";
 
             result = MessageBox.Show(this, Message, "Importation terminée", buttons);
+
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 // ferme formImport et continue l'execution de formMain
@@ -252,6 +293,12 @@ namespace Hector
             }
         }
 
+        /// <summary>
+        /// Gere l'importation du csv et la mise à jour de la base en mode ajout, donc les ancients elements sont gardé
+        /// Les elements du csv deja present dans la base sont mis à jour dans celle ci
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonAjout_Click(object sender, EventArgs e)
         {
             //Trouve le chemin vers le fichier de la bdd
@@ -277,6 +324,7 @@ namespace Hector
             Reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
             progressBar1.Maximum = NbLignes + 1; // Le remplissage de la barre est proportionnel au nombre d'articles a ajouter
+
             progressBar1.Value = 1; // On lance la barre de progression, elle augmentera a chaque etape de l'integration
 
 
@@ -329,11 +377,14 @@ namespace Hector
                     // En premier on verifie si la famille existe
                     // TrouverRefFamille retourne la ref de la famille, ou -1 si cette famille n'existe pas encore
                     RefFamille = TrouverRefFamille(StringFamille, ListeFamilles);
+
                     if (RefFamille == -1)
                     {
                         // On cree la nouvelle famille et on l'ajoute a la liste, sa reference est egale au nombre de familles existantes + 1 (auto increment)
                         Famille NouvelleFamille = new Famille(ListeFamilles.Count + 1, StringFamille);
+
                         ListeFamilles.Add(NouvelleFamille);
+
                         RefFamille = NouvelleFamille.RefFamille;
 
                         // On peut ajouter la famille a la bdd
@@ -362,12 +413,14 @@ namespace Hector
                     // Ensuite on verifie si la marque existe
                     // TrouverRefMarque retourne la ref de la marque, ou -1 si cette sous marque n'existe pas encore
                     RefMarque = TrouverRefMarque(StringMarque, ListeMarques);
+
                     if (RefMarque == -1)
                     {
 
                         // On cree la nouvelle marque et on l'ajoute a la liste, sa reference est egale au nombre de marques existantes + 1 (auto increment)
                         Marque NouvelleMarque = new Marque(ListeMarques.Count + 1, StringMarque);
                         ListeMarques.Add(NouvelleMarque);
+
                         RefMarque = NouvelleMarque.RefMarque;
 
                         // On peut ajouter la sous marque a la bdd
@@ -388,11 +441,14 @@ namespace Hector
                             CommandeInsert.ExecuteNonQuery();
                         }
                     }
+
                     if (!ArticleExiste)
                     {
                         // s'il n'existe pas on le cree puis on l'ajoute dans la bdd
                         Article NouvelArticle = new Article(RefArticle, RefSousFamille, RefMarque, Description, PrixHT, 1);
+
                         ListeArticles.Add(NouvelArticle);
+
                         CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
                             + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
                              + "', '" + NouvelArticle.PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', '" + NouvelArticle.Quantite + "')";
@@ -456,6 +512,12 @@ namespace Hector
             return -1;
         }
 
+        /// <summary>
+        /// Trouve la reference d'une marque pour un nom donnee
+        /// </summary>
+        /// <param name="NomDeLaMarque">Le nom de la marque a trouver</param>
+        /// <param name="ListeMarques">La liste des marques dans la base</param>
+        /// <returns></returns>
         private static int TrouverRefMarque(string NomDeLaMarque, List<Marque> ListeMarques)
         {
             foreach (Marque MarqueAComparer in ListeMarques)
