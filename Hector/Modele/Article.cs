@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Hector.Modele
 {
+    /// <summary>
+    /// La classe qui instancie des articles
+    /// </summary>
     public class Article
     {
         
@@ -18,6 +21,15 @@ namespace Hector.Modele
 
         public int Quantite { get; set; }
 
+        /// <summary>
+        /// Constructeur de Article
+        /// </summary>
+        /// <param name="refArticle">string: la reference de l'article</param>
+        /// <param name="refSousFamille">int: la reference de la sous famille de l'article</param>
+        /// <param name="RefMarque">int: la reference de la marque de l'article</param>
+        /// <param name="Description">string: la description</param>
+        /// <param name="PrixHT">float: le prix de l'article</param>
+        /// <param name="Quantite">int: la quantite de l'article</param>
         public Article(string refArticle, int refSousFamille, int RefMarque, string Description, float PrixHT, int Quantite)
         {
             this.RefArticle = refArticle;

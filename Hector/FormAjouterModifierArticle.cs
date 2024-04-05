@@ -12,6 +12,9 @@ using System.Windows.Forms;
 
 namespace Hector
 {
+    /// <summary>
+    /// Fenetre d'ajout ou de modification d'article
+    /// </summary>
     public partial class FormAjouterModifierArticle : Form
     {
 
@@ -29,6 +32,14 @@ namespace Hector
 
         private Article NouvelArticle; // le nouvel article a ajouter
 
+        /// <summary>
+        /// Instancie une nouvelle instance de l'objet FormAjouterModierArticle
+        /// </summary>
+        /// <param name="EstAjouter"> Bool : Dit s'il s'agit d'une page d'ajout ou de modification </param>
+        /// <param name="Familles">La liste des familles presentes dans la base</param>
+        /// <param name="SousFamilles">La liste des sous-familles presentes dans la base</param>
+        /// <param name="Marques">La liste des marques presentes dans la base</param>
+        /// <param name="ArticleAModif">L'article a modifier, vaut null pour une page d'ajout</param>
         public FormAjouterModifierArticle(bool EstAjouter, List<Famille> Familles , List<SousFamille> SousFamilles, 
             List<Marque> Marques ,Article ArticleAModif = null)
         {
@@ -39,11 +50,16 @@ namespace Hector
             ListeSousFamillesPossibles = new List<SousFamille>();
             NouvelArticle = null;
 
-
             this.EstAjouter = EstAjouter;
+
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Gere l'affichage initial de la fenetre, les label et valeurs initiales dependent de l'article a modifier
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormAjouterModifier_Load(object sender, EventArgs e)
         {
 
@@ -256,6 +272,7 @@ namespace Hector
                 DialogResult result;
 
                 result = MessageBox.Show(this, "La modification a bien été prise en compte.", "Importation terminée", MessageBoxButtons.OK);
+                
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     // ferme la fenetre et continue l'execution de formMain
@@ -291,6 +308,11 @@ namespace Hector
             }
         }
 
+        /// <summary>
+        /// Gere le chargement de la liste de sous familles selectionnables une fois qu'une famille a été selectionnée
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ComboBoxFamille_SelectedIndexChanged(object sender, EventArgs e)
         {
             ListeSousFamillesPossibles = TrouverSousFamilles(ListeFamilles[ComboBoxFamille.SelectedIndex]);
@@ -302,6 +324,11 @@ namespace Hector
             ComboBoxSousFamille.Enabled = true;
         }
 
+        /// <summary>
+        /// Trouve toutes les sous familles liées à une famille donnée
+        /// </summary>
+        /// <param name="FamilleSelection">La famille selectionnée</param>
+        /// <returns>Toutes les familles liées à la famille selectionnée</returns>
         private List<SousFamille> TrouverSousFamilles(Famille FamilleSelection)
         {
             List<SousFamille> SousFamillesPossibles = new List<SousFamille>();
@@ -318,6 +345,10 @@ namespace Hector
             return SousFamillesPossibles;
         }
 
+        /// <summary>
+        /// Accesseur en lecture de ArticleAModifier et ArticleAModifier
+        /// </summary>
+        /// <returns>Article: l'article modifié ou ajouté</returns>
         public Article GetArticle()
         {
             if (!EstAjouter)
