@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace Hector
 {
+    /// <summary>
+    /// Fenetre principale de l'application
+    /// </summary>
     public partial class FormMain : Form
     {
 
