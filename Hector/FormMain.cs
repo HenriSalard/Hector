@@ -628,13 +628,14 @@ namespace Hector
 
             if (ImportDialog.ShowDialog(this) == DialogResult.OK)
             {
-                // Suppression de la fenetre Importer
+                // Modification de l'article dans la liste
                 ListArticle.Remove(Article);
 
                 ListArticle.Add(ImportDialog.GetArticle());
 
                 ImportDialog.Dispose();
 
+                // Suppression de la fenetre Importer
                 this.RefreshListArticle("NoeudArticle", null);
             }
         }
@@ -652,11 +653,14 @@ namespace Hector
 
             if (ImportDialog.ShowDialog(this) == DialogResult.OK)
             {
-                // Suppression de la fenetre Importer
+                // Ajout de l'article dans la liste
 
-                this.RefreshTree();
+                ListArticle.Add(ImportDialog.GetArticle());
 
                 ImportDialog.Dispose();
+
+                // Suppression de la fenetre Importer
+                this.RefreshListArticle("NoeudArticle", null);
             }
 
         }
