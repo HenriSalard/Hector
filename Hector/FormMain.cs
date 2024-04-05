@@ -779,13 +779,95 @@ namespace Hector
                 }
                 else if (Node.FullPath.Equals("Famille"))
                 {
-                    RefreshListArticle("NoeudFamille", null);
+                    Supprimer_Famille(ListFamille.Find(x => x.NomFamille == Item.SubItems[1].Text));
                 }
                 else
                 {
-
+                    Supprimer_SousFamille(ListSousFamille.Find(x => x.NomSousFamille == Item.SubItems[1].Text));
                 }
                                 
+            }
+        }
+
+        private void Supprimer_Famille(Famille Famille)
+        {
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            SQLiteCommand CommandeSQLite = new SQLiteCommand("SELECT count(*) FROM SousFamilles WHERE RefFamille = '" + Famille.RefFamille + "'", Con);
+
+            SQLiteDataReader Lecteur = CommandeSQLite.ExecuteReader();
+
+            Lecteur.Read();
+
+            int Count = Lecteur.GetInt32(0);
+
+            if (Count != 0)
+            {
+                const string message = "Impossible de supprimer cet élement";
+                const string caption = "Attention";
+                var result = MessageBox.Show(message, caption,
+                                             MessageBoxButtons.OK,
+                                             MessageBoxIcon.Error);
+            }
+            else
+            {
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+
+                CommandeInsert.CommandText = "DELETE FROM Familles WHERE RefFamille = '" + Famille.RefFamille + "'";
+
+                CommandeInsert.ExecuteNonQuery();
+
+                ListFamille.Remove(Famille);
+
+                this.RefreshTree();
+
+                this.RefreshListArticle("NoeudFamille", null);
+
+            }
+        }
+
+        private void Supprimer_SousFamille(SousFamille SousFamille)
+        {
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            SQLiteCommand CommandeSQLite = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefSousFamille = '" + SousFamille.RefSousFamille + "'", Con);
+
+            SQLiteDataReader Lecteur = CommandeSQLite.ExecuteReader();
+
+            Lecteur.Read();
+
+            int Count = Lecteur.GetInt32(0);
+
+            if (Count != 0)
+            {
+                const string message = "Impossible de supprimer cet élement";
+                const string caption = "Attention";
+                var result = MessageBox.Show(message, caption,
+                                             MessageBoxButtons.OK,
+                                             MessageBoxIcon.Error);
+            }
+            else
+            {
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+
+                CommandeInsert.CommandText = "DELETE FROM SousFamilles WHERE RefSousFamille = '" + SousFamille.RefSousFamille + "'";
+
+                CommandeInsert.ExecuteNonQuery();
+
+                ListSousFamille.Remove(SousFamille);
+
+                this.RefreshTree();
+
+                this.RefreshListArticle("NoeudFamille", null);
+
             }
         }
 
@@ -796,20 +878,39 @@ namespace Hector
                 + "\\Hector.sqlite");
 
             Con.Open();
+            
+            SQLiteCommand CommandeSQLite = new SQLiteCommand("SELECT count(*) FROM Articles WHERE RefMarque = '" + Marque.RefMarque + "'", Con);
 
-            SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+            SQLiteDataReader Lecteur = CommandeSQLite.ExecuteReader();
 
-            CommandeInsert.CommandText = "DELETE FROM Marques WHERE RefMarque = '" + Marque.RefMarque + "'";
+            Lecteur.Read();
 
-            CommandeInsert.ExecuteNonQuery();
+            int Count = Lecteur.GetInt32(0);
 
-            Con.Close();
+            if(Count != 0)
+            {
+                const string message = "Impossible de supprimer cet élement";
+                const string caption = "Attention";
+                var result = MessageBox.Show(message, caption,
+                                             MessageBoxButtons.OK,
+                                             MessageBoxIcon.Error);
+            }
+            else
+            {
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
 
-            ListMarque.Remove(Marque);
+                CommandeInsert.CommandText = "DELETE FROM Marques WHERE RefMarque = '" + Marque.RefMarque + "'";
 
-            this.RefreshTree();
+                CommandeInsert.ExecuteNonQuery();
 
-            this.RefreshListArticle("NoeudMarque", null);
+                ListMarque.Remove(Marque);
+
+                this.RefreshTree();
+
+                this.RefreshListArticle("NoeudMarque", null);
+
+            }
+            
         }
 
         private void Supprimer_Article(Article Article)
