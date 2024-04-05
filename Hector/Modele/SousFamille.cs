@@ -6,9 +6,17 @@ using System.Threading.Tasks;
 
 namespace Hector.Modele
 {
+    /// <summary>
+    /// La classe qui instancie les sous-familles dans l'application
+    /// </summary>
     public class SousFamille
     {
-
+        /// <summary>
+        /// Constructeur de SousFamille
+        /// </summary>
+        /// <param name="refSousFamille">int: la reference de la sous-famille</param>
+        /// <param name="refFamille">int: La reference de la famille liée à la osus-famille</param>
+        /// <param name="nomSousFamille">string: Le nom de la sous-famille</param>
         public SousFamille(int refSousFamille, int refFamille, string nomSousFamille)
         {
             this.RefSousFamille = refSousFamille;

@@ -97,14 +97,12 @@ namespace Hector.Modele
         /// Requete SQL pour recuperer la liste des Articles
         /// </summary>
         /// <param name="Con"></param>
-        /// <returns></returns>
+        /// <returns>La liste des articles de la base de données</returns>
         public static List<Article> SQLiteRecupererArticles(SQLiteConnection Con)
         {
             List<Article> Liste = new List<Article>();
 
-
             string requette = "SELECT RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite FROM Articles";
-
 
             SQLiteCommand CommandeSQLite = new SQLiteCommand(requette, Con);
 
@@ -120,6 +118,12 @@ namespace Hector.Modele
             return Liste;
         }
 
+        /// <summary>
+        /// Requete qui permet de recuperer les sous-familles de la base
+        /// </summary>
+        /// <param name="Con"></param>
+        /// <param name="FamilleName"></param>
+        /// <returns>La liste des sous familles</returns>
         public static List<SousFamille> SQLiteSousFamilleFromFamilleName(SQLiteConnection Con,string FamilleName)
         {
             List<SousFamille> Liste = new List<SousFamille>();
