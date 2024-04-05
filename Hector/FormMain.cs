@@ -112,8 +112,6 @@ namespace Hector
 
         protected void RefreshTree()
         {
-
-            //LoadLists();
             
             treeView1.BeginUpdate();
 
@@ -601,19 +599,7 @@ namespace Hector
                 ImportDialog.Dispose();
             }
         }
-
-        private void listView1_MouseClick(object sender, MouseEventArgs e)
-        {
-            Control c = sender as Control;
-
-            if (e.Button == MouseButtons.Right)
-            {                
-                supprimerToolStripMenuItem.Enabled = true;
-                modifierToolStripMenuItem.Enabled = true;                
-                contextMenuStrip1.Show(c, e.Location);
-            }
-        }
-
+        
         private void modifierToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListViewItem Item = listView1.SelectedItems[0];
@@ -665,18 +651,6 @@ namespace Hector
 
         }
 
-        private void FormMain_MouseClick(object sender, MouseEventArgs e)
-        {
-            Control c = sender as Control;
-
-            if (e.Button == MouseButtons.Right)
-            {
-                supprimerToolStripMenuItem.Enabled = false;
-                modifierToolStripMenuItem.Enabled = false;
-                contextMenuStrip1.Show(c, e.Location);
-            }
-        }
-
         private void supprimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             const string message = "Etes vous sûr de supprimer cet ligne?\nCette action est irrévocable.";
@@ -696,6 +670,29 @@ namespace Hector
 
 
 
+            }
+        }
+
+        private void listView1_MouseUp(object sender, MouseEventArgs e)
+        {
+            ListView c = sender as ListView;
+
+            if (e.Button == MouseButtons.Right)
+            {
+
+                if(c.SelectedItems.Count > 0)
+                {
+                    supprimerToolStripMenuItem.Enabled = true;
+                    modifierToolStripMenuItem.Enabled = true;
+
+                }
+                else
+                {
+                    supprimerToolStripMenuItem.Enabled = false;
+                    modifierToolStripMenuItem.Enabled = false;
+                }
+
+                contextMenuStrip1.Show(c, e.Location);
             }
         }
     }
