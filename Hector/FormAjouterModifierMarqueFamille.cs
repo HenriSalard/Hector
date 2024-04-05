@@ -42,7 +42,7 @@ namespace Hector
         /// <param name="FamilleAModifier">La famille a modifier, null par defaut</param>
         /// <param name="SousFamilleAModifier">La sous famille a modifier, null par defaut</param>
         public FormAjouterModifierMarqueFamille(bool Ajouter, string Type, List<Famille> ListeFamilles, List<SousFamille> ListeSousFamilles, List<Marque> ListeMarques,
-            Marque MarqueAModifier = null, Famille FamilleAModifier=null, SousFamille SousFamilleAModifier = null)
+            Marque MarqueAModifier, Famille FamilleAModifier, SousFamille SousFamilleAModifier)
         {
             EstAjouter = Ajouter;
 
@@ -74,6 +74,8 @@ namespace Hector
                     label1.Text = "Creer une marque";
 
                     ComboBoxFamille.Visible = false;
+
+                    label3.Visible = false;
                 }
 
                 if(TypeDePage == "Famille")
@@ -81,6 +83,8 @@ namespace Hector
                     label1.Text = "Creer une famille";
 
                     ComboBoxFamille.Visible = false;
+
+                    label3.Visible = false;
                 }
 
                 // Y a que pour les sous familles qu'on affiche le choix de la famille
@@ -114,6 +118,10 @@ namespace Hector
                     label1.Text = "Modifier la marque n° " + MarqueAModifier.RefMarque;
 
                     textBox1.Text = MarqueAModifier.NomMarque;
+
+                    ComboBoxFamille.Visible = false;
+
+                    label3.Visible = false;
                 }
 
                 if(TypeDePage == "Famille")
@@ -121,10 +129,16 @@ namespace Hector
                     label1.Text = "Modifier la famille n°" + FamilleAModifier.RefFamille;
 
                     textBox1.Text = FamilleAModifier.NomFamille;
+
+                    ComboBoxFamille.Visible = false;
+
+                    label3.Visible = false;
                 }
                 if(TypeDePage == "SousFamille")
                 {
                     label1.Text = "Modifier la sous-famille n°" + SousFamilleAModifier.RefSousFamille;
+
+                    textBox1.Text = SousFamilleAModifier.NomSousFamille;
 
                     // On cherche la famille de la sousFamille a modifier et on place le comboBox dessus
                     foreach(Famille Fam in ListeFamilles)

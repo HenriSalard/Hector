@@ -604,51 +604,152 @@ namespace Hector
         {
             ListViewItem Item = listView1.SelectedItems[0];
 
-            Article Article = ListArticle.Find(x => x.RefArticle == Item.Text);
-
-            FormAjouterModifierArticle ImportDialog =
-                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, Article);
-
-            // Affichage de la fenetre Importer
-
-
-            if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+            if (treeView1.SelectedNode.FullPath.Equals("Famille"))
             {
-                // Modification de l'article dans la liste
-                ListArticle.Remove(Article);
 
-                ListArticle.Add(ImportDialog.GetArticle());
+                Famille Fam = ListFamille.Find(x => x.NomFamille == Item.SubItems[1].Text);
 
-                ImportDialog.Dispose();
+                FormAjouterModifierMarqueFamille FamMarqueDialog = new FormAjouterModifierMarqueFamille(false, "Famille", ListFamille, ListSousFamille, ListMarque, null, Fam, null);
 
-                // Suppression de la fenetre Importer
-                this.RefreshListArticle("NoeudArticle", null);
+                if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListFamille.Add(FamMarqueDialog.GetFamille());
+
+                    FamMarqueDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudFamille", null);
+                }
             }
+            else if (treeView1.SelectedNode.FullPath.Equals("Marques"))
+            {
+                FormAjouterModifierMarqueFamille FamMarqueDialog = new FormAjouterModifierMarqueFamille(false, "Marque", ListFamille, ListSousFamille, ListMarque, ListMarque.Find(x => x.NomMarque.ToString() == Item.SubItems[1].Text), null, null);
+
+                if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListFamille.Add(FamMarqueDialog.GetFamille());
+
+                    FamMarqueDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudMarque", null);
+                }
+            }
+            else if (treeView1.SelectedNode.FullPath.Equals("Tous les articles"))
+            {
+                FormAjouterModifierArticle ImportDialog = new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
+
+                // Affichage de la fenetre Importer
+
+
+                if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListArticle.Add(ImportDialog.GetArticle());
+
+                    ImportDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudArticle", null);
+                }
+            }
+            else
+            {
+                FormAjouterModifierMarqueFamille FamMarqueDialog = new FormAjouterModifierMarqueFamille(false, "SousFamille", ListFamille, ListSousFamille, ListMarque, null, null, ListSousFamille.Find(x => x.NomSousFamille == Item.SubItems[1].Text));
+
+                if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListFamille.Add(FamMarqueDialog.GetFamille());
+
+                    FamMarqueDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudFamille", null);
+                }
+            }
+
         }
 
         private void ajouterToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            ListViewItem Item = listView1.SelectedItems[0];
 
-            FormAjouterModifierArticle ImportDialog =
-                        new FormAjouterModifierArticle(true, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
-
-            // Affichage de la fenetre Importer
-
-
-            if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+            if (treeView1.SelectedNode.FullPath.Equals("Famille"))
             {
-                // Ajout de l'article dans la liste
 
-                ListArticle.Add(ImportDialog.GetArticle());
+                FormAjouterModifierMarqueFamille FamMarqueDialog = new FormAjouterModifierMarqueFamille(true,"Famille",ListFamille,ListSousFamille,ListMarque,null, null ,null);
 
-                ImportDialog.Dispose();
+                if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
 
-                // Suppression de la fenetre Importer
-                this.RefreshListArticle("NoeudArticle", null);
+                    ListFamille.Add(FamMarqueDialog.GetFamille());
+
+                    FamMarqueDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudFamille", null);
+                }
             }
+            else if (treeView1.SelectedNode.FullPath.Equals("Marques"))
+            {
+                FormAjouterModifierMarqueFamille FamMarqueDialog = new FormAjouterModifierMarqueFamille(true, "Marque", ListFamille, ListSousFamille, ListMarque, null, null, null);
 
+                if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListFamille.Add(FamMarqueDialog.GetFamille());
+
+                    FamMarqueDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudMarque", null);
+                }
+            }
+            else if (treeView1.SelectedNode.FullPath.Equals("Tous les articles"))
+            {
+                FormAjouterModifierArticle ImportDialog = new FormAjouterModifierArticle(true, ListFamille, ListSousFamille, ListMarque, null);
+
+                // Affichage de la fenetre Importer
+
+
+                if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListArticle.Add(ImportDialog.GetArticle());
+
+                    ImportDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudArticle", null);
+                }
+            }
+            else
+            {
+                FormAjouterModifierMarqueFamille FamMarqueDialog = new FormAjouterModifierMarqueFamille(true, "SousFamille", ListFamille, ListSousFamille, ListMarque, null, null, null);
+
+                if (FamMarqueDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    // Ajout de l'article dans la liste
+
+                    ListFamille.Add(FamMarqueDialog.GetFamille());
+
+                    FamMarqueDialog.Dispose();
+
+                    // Suppression de la fenetre Importer
+                    this.RefreshListArticle("NoeudFamille", null);
+                }
+            }
+            
         }
 
         private void supprimerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -656,7 +757,7 @@ namespace Hector
             const string message = "Etes vous sûr de supprimer cet ligne?\nCette action est irrévocable.";
             const string caption = "Supprimer élément";
             var result = MessageBox.Show(message, caption,
-                                         MessageBoxButtons.OKCancel,
+                                         MessageBoxButtons.YesNo,
                                          MessageBoxIcon.Warning);
 
             
@@ -664,13 +765,74 @@ namespace Hector
             {
                 // TODO Mettre code pour supprimer élément
 
+                TreeNode Node = treeView1.SelectedNode;
 
+                ListViewItem Item = listView1.SelectedItems[0];
 
+                if (Node.FullPath.Equals("Marques"))
+                {
+                    Supprimer_Marque(ListMarque.Find(x => x.NomMarque.ToString() == Item.SubItems[1].Text));
+                }
+                else if (Node.FullPath.Equals("Tous les articles"))
+                {
+                    Supprimer_Article(ListArticle.Find(x => x.RefArticle == Item.Text));
+                }
+                else if (Node.FullPath.Equals("Famille"))
+                {
+                    RefreshListArticle("NoeudFamille", null);
+                }
+                else
+                {
 
-
-
-
+                }
+                                
             }
+        }
+
+        private void Supprimer_Marque(Marque Marque)
+        {
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+
+            CommandeInsert.CommandText = "DELETE FROM Marques WHERE RefMarque = '" + Marque.RefMarque + "'";
+
+            CommandeInsert.ExecuteNonQuery();
+
+            Con.Close();
+
+            ListMarque.Remove(Marque);
+
+            this.RefreshTree();
+
+            this.RefreshListArticle("NoeudMarque", null);
+        }
+
+        private void Supprimer_Article(Article Article)
+        {
+            SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+            Con.Open();
+
+            SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+
+            CommandeInsert.CommandText = "DELETE FROM Articles WHERE RefArticle = '" + Article.RefArticle + "'";
+
+            CommandeInsert.ExecuteNonQuery();
+
+            Con.Close();
+
+            ListArticle.Remove(Article);
+
+            this.RefreshTree();
+
+            this.RefreshListArticle("NoeudArticle", null);
         }
 
         private void listView1_MouseUp(object sender, MouseEventArgs e)
