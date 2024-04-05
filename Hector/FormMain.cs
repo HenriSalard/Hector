@@ -102,7 +102,7 @@ namespace Hector
         private void FormMain_Load(object sender, EventArgs e)
         {
 
-            this.RefreshTree();
+            AllRefresh();
 
             lvwColumnSorter = new ListViewColumnSorter();
             this.listView1.ListViewItemSorter = lvwColumnSorter;
@@ -568,6 +568,8 @@ namespace Hector
                     this.RefreshTree();
 
                     ImportDialog.Dispose();
+
+
                 }
             }
             if(e.KeyCode == Keys.Delete)
@@ -602,8 +604,10 @@ namespace Hector
         {
             ListViewItem Item = listView1.SelectedItems[0];
 
+            Article Article = ListArticle.Find(x => x.RefArticle == Item.Text);
+
             FormAjouterModifierArticle ImportDialog =
-                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
+                        new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, Article);
 
             // Affichage de la fenetre Importer
 
@@ -611,10 +615,13 @@ namespace Hector
             if (ImportDialog.ShowDialog(this) == DialogResult.OK)
             {
                 // Suppression de la fenetre Importer
+                ListArticle.Remove(Article);
 
-                this.RefreshTree();
+                ListArticle.Add(ImportDialog.GetArticle());
 
                 ImportDialog.Dispose();
+
+                this.RefreshListArticle("NoeudArticle", null);
             }
         }
 

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,6 +25,10 @@ namespace Hector
 
         private List<Marque> ListeMarques;
 
+        private List<SousFamille> ListeSousFamillesPossibles;
+
+        private Article NouvelArticle; // le nouvel article a ajouter
+
         public FormAjouterModifierArticle(bool EstAjouter, List<Famille> Familles , List<SousFamille> SousFamilles, 
             List<Marque> Marques ,Article ArticleAModif = null)
         {
@@ -31,6 +36,8 @@ namespace Hector
             ListeFamilles = Familles;
             ListeMarques = Marques;
             ListeSousFamilles = SousFamilles;
+            ListeSousFamillesPossibles = new List<SousFamille>();
+            NouvelArticle = null;
 
 
             this.EstAjouter = EstAjouter;
@@ -56,11 +63,7 @@ namespace Hector
             // Le comboBox affichera l'attribut nomFamille 
             ComboBoxFamille.DisplayMember = "NomFamille";
 
-            // on fait pareil pour les sous-familles et marques
-            ComboBoxSousFamille.DataSource = ListeSousFamilles;
-
-            
-            ComboBoxSousFamille.DisplayMember = "NomSousFamille";
+            ComboBoxSousFamille.Enabled =  false;
 
             ComboBoxMarque.DataSource = ListeMarques;
 
@@ -92,17 +95,30 @@ namespace Hector
                     // Recuperation de la sous famille initiale
                     if(SF.RefSousFamille == ArticleAModifier.RefSousFamille)
                     {
-                        ComboBoxSousFamille.SelectedItem = SF;
 
-                        foreach(Famille Fam in ListeFamilles)
+                        foreach (Famille Fam in ListeFamilles)
                         {
 
                             // Recuperation de la famille initiale
-                            if(Fam.RefFamille == SF.RefFamille)
+                            if (Fam.RefFamille == SF.RefFamille)
                             {
                                 ComboBoxFamille.SelectedItem = Fam;
+
+                                // recuperation des sous familles a afficher (on affiche que celles liées à la famille séléctionnée)
+                                ListeSousFamillesPossibles = TrouverSousFamilles(ListeFamilles[ComboBoxFamille.SelectedIndex]);
+
+                                ComboBoxSousFamille.DataSource = ListeSousFamillesPossibles;
+
+                                ComboBoxSousFamille.DisplayMember = "NomSousFamille";
+
+                                ComboBoxSousFamille.Enabled = true;
+
+                                break;
+
                             }
+
                         }
+
                     }
                 }
 
@@ -117,10 +133,7 @@ namespace Hector
             }
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
 
-        }
 
         /// <summary>
         /// Verifie la validité des données saisies. Puis met à jour l'article dans l'application et la base de données
@@ -168,15 +181,15 @@ namespace Hector
             // Verrification que le prix est un float
             if (!float.TryParse(TextBoxPrix.Text, out float resultatPrix))
             {
-                string Message = "Erreur! Prix incorrect! (format: 20.5)";
+                string Message = "Erreur! Prix incorrect! (format: 20,5)";
                 MessageBox.Show(this, Message, "Erreur");
                 return;
             }
 
-            // Verrification que la quantite est un int
+            // Verrification que la quantite est un int et > 0
             if (!int.TryParse(TextBoxQuantite.Text, out int resultatquantite))
             {
-                string Message = "Erreur! Prix incorrect! (format: 20,5)";
+                string Message = "Erreur! La quantite est inccorecte";
                 MessageBox.Show(this, Message, "Erreur");
                 return;
             }
@@ -204,7 +217,7 @@ namespace Hector
 
             // Verrification que la sous famille selectionnée va bien avec la famille selectionnée
             if(ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille 
-                != ListeSousFamilles[ComboBoxSousFamille.SelectedIndex].RefFamille)
+                != ListeSousFamillesPossibles[ComboBoxSousFamille.SelectedIndex].RefFamille)
             {
                 string Message = "Erreur! La famille et la sous-famille ne sont pas liées.";
                 MessageBox.Show(this, Message, "Erreur");
@@ -227,12 +240,12 @@ namespace Hector
                 ArticleAModifier.PrixHT = float.Parse(TextBoxPrix.Text);
                 ArticleAModifier.Quantite = int.Parse(TextBoxQuantite.Text);
                 ArticleAModifier.RefMarque = ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque;
-                ArticleAModifier.RefSousFamille = ListeSousFamilles[ComboBoxSousFamille.SelectedIndex].RefSousFamille;
+                ArticleAModifier.RefSousFamille = ListeSousFamillesPossibles[ComboBoxSousFamille.SelectedIndex].RefSousFamille;
 
                 SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
 
                 CommandeInsert.CommandText = "UPDATE Articles SET Description = '" + ArticleAModifier.Description + "', RefSousFamille = '" + ArticleAModifier.RefSousFamille + "'," +
-                    " PrixHT = '" + ArticleAModifier.PrixHT + "', RefMarque = '" + ArticleAModifier.RefMarque + "' WHERE RefArticle = '" + ArticleAModifier.RefArticle + "'";
+                    " PrixHT = '" + ArticleAModifier.PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', RefMarque = '" + ArticleAModifier.RefMarque + "' WHERE RefArticle = '" + ArticleAModifier.RefArticle + "'";
                 
                 CommandeInsert.ExecuteNonQuery();
 
@@ -253,14 +266,14 @@ namespace Hector
             // Cas ajout
             else
             {
-                Article NouvelArticle = new Article(TextBoxRef.Text, ListeSousFamilles[ComboBoxSousFamille.SelectedIndex].RefSousFamille, ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque,
+                NouvelArticle = new Article(TextBoxRef.Text, ListeSousFamillesPossibles[ComboBoxSousFamille.SelectedIndex].RefSousFamille, ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque,
                     TextBoxDescription.Text, float.Parse(TextBoxPrix.Text), int.Parse(TextBoxQuantite.Text));
 
                 SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
 
                 CommandeInsert.CommandText = "INSERT INTO Articles(RefArticle, Description, RefSousFamille, RefMarque, PrixHT, Quantite) VALUES('"
                     + NouvelArticle.RefArticle + "', '" + NouvelArticle.Description + "', '" + NouvelArticle.RefSousFamille + "', '" + NouvelArticle.RefMarque
-                     + "', '" + NouvelArticle.PrixHT + "', '" + NouvelArticle.Quantite + "')";
+                     + "', '" + NouvelArticle.PrixHT.ToString("0.00", new CultureInfo("fr-FR")) + "', '" + NouvelArticle.Quantite + "')";
                 CommandeInsert.ExecuteNonQuery();
 
                 Con.Close();
@@ -279,6 +292,45 @@ namespace Hector
         }
 
         private void ComboBoxFamille_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListeSousFamillesPossibles = TrouverSousFamilles(ListeFamilles[ComboBoxFamille.SelectedIndex]);
+
+            ComboBoxSousFamille.DataSource = ListeSousFamillesPossibles;
+
+            ComboBoxSousFamille.DisplayMember = "NomSousFamille";
+
+            ComboBoxSousFamille.Enabled = true;
+        }
+
+        private List<SousFamille> TrouverSousFamilles(Famille FamilleSelection)
+        {
+            List<SousFamille> SousFamillesPossibles = new List<SousFamille>();
+            int RefFamille = FamilleSelection.RefFamille;
+
+            foreach (SousFamille SF in ListeSousFamilles)
+            {
+                if (SF.RefFamille == RefFamille)
+                {
+                    SousFamillesPossibles.Add(SF);
+                }
+            }
+
+            return SousFamillesPossibles;
+        }
+
+        public Article GetArticle()
+        {
+            if (!EstAjouter)
+            {
+                return ArticleAModifier;
+            }
+            else
+            {
+                return NouvelArticle;
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
         {
 
         }
