@@ -11,8 +11,16 @@ using System.Threading.Tasks;
 
 namespace Hector.Modele
 {
+    /// <summary>
+    /// Classe qui repertorie les differentes methodes pour acceder à la base de données SQLite
+    /// </summary>
     class FonctionsSQLite
     {
+        /// <summary>
+        /// Requete SQL pour recuperer la liste des marques de la base de données
+        /// </summary>
+        /// <param name="Con"></param>
+        /// <returns>La liste des marques</returns>
         public static List<Marque> SQLiteRecupererMarques(SQLiteConnection Con)
         {
             List<Marque> Liste = new List<Marque>();
@@ -34,6 +42,11 @@ namespace Hector.Modele
             return Liste;
         }
 
+        /// <summary>
+        /// Requete SQL pour recuperer la liste des Familles
+        /// </summary>
+        /// <param name="Con"></param>
+        /// <returns>La liste des familles présentes dans la base</returns>
         public static List<Famille> SQLiteRecupererFamilles(SQLiteConnection Con)
         {
             List<Famille> Liste = new List<Famille>();
@@ -55,6 +68,11 @@ namespace Hector.Modele
             return Liste;
         }
 
+        /// <summary>
+        /// Requete SQL pour recuperer la liste des Familles
+        /// </summary>
+        /// <param name="Con"></param>
+        /// <returns>La liste des sous familles présentes dans la bas</returns>
         public static List<SousFamille> SQLiteRecupererSousFamilles(SQLiteConnection Con)
         {
             List<SousFamille> Liste = new List<SousFamille>();
@@ -75,6 +93,11 @@ namespace Hector.Modele
             return Liste;
         }
 
+        /// <summary>
+        /// Requete SQL pour recuperer la liste des Articles
+        /// </summary>
+        /// <param name="Con"></param>
+        /// <returns></returns>
         public static List<Article> SQLiteRecupererArticles(SQLiteConnection Con)
         {
             List<Article> Liste = new List<Article>();

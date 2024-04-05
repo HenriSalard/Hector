@@ -11,6 +11,9 @@ using System.Windows.Forms;
 
 namespace Hector
 {
+    /// <summary>
+    /// Fenetre d'ajout/modification des marques,familles et sous-familles
+    /// </summary>
     public partial class FormAjouterModifierMarqueFamille : Form
     {
         private List<Famille> ListeFamilles;
@@ -63,8 +66,14 @@ namespace Hector
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Gere l'affichage initial de la page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormAjouterModifierMarqueFamille_Load(object sender, EventArgs e)
         {
+            textBox1.MaxLength = 50;
 
             // Load page d'ajout
             if (EstAjouter)
@@ -155,6 +164,11 @@ namespace Hector
             }
         }
 
+        /// <summary>
+        /// Gere le clic sur le bouton de validation, et donc l'ajout ou la modification de l'element
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             if(textBox1.Text.Length == 0)
@@ -271,16 +285,28 @@ namespace Hector
 
         }
 
+        /// <summary>
+        /// Accesseur en lecture de FamilleAModifier
+        /// </summary>
+        /// <returns>La famille modifiée ou ajouté</returns>
         public Famille GetFamille()
         {
             return FamilleAModifier;
         }
 
+        /// <summary>
+        /// Accesseur en lecture de SousFamilleAModifier
+        /// </summary>
+        /// <returns>La sous-famille modifiée ou ajouté</returns>
         public SousFamille GetSousFamille()
         {
             return SousFamilleAModifier;
         }
 
+        /// <summary>
+        /// Accesseur en lecture de MarqueAModifier
+        /// </summary>
+        /// <returns>La marque modifiée ou ajouté</returns>
         public Marque GetMarque()
         {
             return MarqueAModifier;
