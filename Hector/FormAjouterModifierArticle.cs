@@ -27,6 +27,8 @@ namespace Hector
 
         private List<SousFamille> ListeSousFamillesPossibles;
 
+        private Article NouvelArticle; // le nouvel article a ajouter
+
         public FormAjouterModifierArticle(bool EstAjouter, List<Famille> Familles , List<SousFamille> SousFamilles, 
             List<Marque> Marques ,Article ArticleAModif = null)
         {
@@ -35,6 +37,7 @@ namespace Hector
             ListeMarques = Marques;
             ListeSousFamilles = SousFamilles;
             ListeSousFamillesPossibles = new List<SousFamille>();
+            NouvelArticle = null;
 
 
             this.EstAjouter = EstAjouter;
@@ -263,7 +266,7 @@ namespace Hector
             // Cas ajout
             else
             {
-                Article NouvelArticle = new Article(TextBoxRef.Text, ListeSousFamillesPossibles[ComboBoxSousFamille.SelectedIndex].RefSousFamille, ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque,
+                NouvelArticle = new Article(TextBoxRef.Text, ListeSousFamillesPossibles[ComboBoxSousFamille.SelectedIndex].RefSousFamille, ListeMarques[ComboBoxMarque.SelectedIndex].RefMarque,
                     TextBoxDescription.Text, float.Parse(TextBoxPrix.Text), int.Parse(TextBoxQuantite.Text));
 
                 SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
@@ -313,6 +316,18 @@ namespace Hector
             }
 
             return SousFamillesPossibles;
+        }
+
+        public Article GetArticle()
+        {
+            if (!EstAjouter)
+            {
+                return ArticleAModifier;
+            }
+            else
+            {
+                return NouvelArticle;
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
