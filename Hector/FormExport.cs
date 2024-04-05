@@ -13,27 +13,38 @@ using System.Windows.Forms;
 
 namespace Hector
 {
+    /// <summary>
+    /// Fenetre d'exportation de la base de données vers un fichier csv
+    /// </summary>
     public partial class FormExport : Form
     {
+        /// <summary>
+        /// Constructeur par defaut de la classe
+        /// </summary>
         public FormExport()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Gere le clic sur le bouton de selection de fichier
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             var FileContent = string.Empty;
             var FilePath = string.Empty;
 
+            // Connexion à la base de données
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
                 + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
                 + "\\Hector.sqlite");
 
             Con.Open();
 
+            // Recuperer les articles
             List<Article> ListArticles = FonctionsSQLite.SQLiteRecupererArticles(Con);
-
-            
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -46,6 +57,7 @@ namespace Hector
                 {
                     this.label1.Text = openFileDialog.SafeFileName;
 
+                    // Initialisation de la barre de progression
                     progressBar1.Visible = true;
                     progressBar1.Minimum = 1;
                     progressBar1.Maximum = ListArticles.Count()+2;
@@ -58,11 +70,13 @@ namespace Hector
                     using (StreamWriter Writer = File.AppendText(openFileDialog.FileName))
                     {
                     
-
+                        // Ecriture du header du csv
                         Writer.WriteLine("Description;Ref;Marque;Famille;Sous-Famille;Prix H.T.");
 
+                        // mise à jour de la barre de progression
                         progressBar1.PerformStep();
 
+                        // Ecriture de chaque ligne dans le csv
                         for (int Idarticle = 0; Idarticle < ListArticles.Count; Idarticle++)
                         {
                             Marque Marque = FonctionsSQLite.SQLiteRecupererMarques(Con)[ListArticles[Idarticle].RefMarque - 1];
@@ -85,11 +99,17 @@ namespace Hector
                 }
             }
 
+            // Fermeture de la base de données
             Con.Close();
 
             this.Close();
         }
 
+        /// <summary>
+        /// Chargement de la page d'export
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormExport_Load(object sender, EventArgs e)
         {
             this.label1.Text = "Veillez choisir un emplacement";

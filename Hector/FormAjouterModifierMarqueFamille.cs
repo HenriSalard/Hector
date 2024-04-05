@@ -193,13 +193,14 @@ namespace Hector
 
                 Con.Open();
 
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
+
+                SQLiteCommand CommandeRead = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour lire les references
+
+
                 // Cas Ajout
                 if (EstAjouter)
                 {
-
-                    SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
-
-                    SQLiteCommand CommandeRead = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour lire les references
 
                     if (TypeDePage == "Marque")
                     {
@@ -218,7 +219,9 @@ namespace Hector
 
                         // Creation de la marque a ajouter qui sera renvoyé à formMain
                         MarqueAModifier = new Marque(Lecteur.GetInt32(0), textBox1.Text);
-                        
+
+                        Lecteur.Read();
+
                     }
 
                     if(TypeDePage == "Famille")
@@ -237,6 +240,8 @@ namespace Hector
 
                         // Creation de la famille a ajouter qui sera renvoyé à formMain
                         FamilleAModifier = new Famille(Lecteur.GetInt32(0), textBox1.Text);
+
+                        Lecteur.Read();
 
                     }
 
@@ -258,6 +263,7 @@ namespace Hector
                         // Creation de la famille a ajouter qui sera renvoyé à formMain
                         SousFamilleAModifier = new SousFamille(Lecteur.GetInt32(0), ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille, textBox1.Text);
 
+                        Lecteur.Read();
                     }
 
                     Con.Close();
@@ -278,7 +284,6 @@ namespace Hector
                 // Cas modification
                 else
                 {
-                    SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con); // Definition de la commande a utiliser pour modifier la bdd
 
                     if (TypeDePage == "Marque")
                     {
@@ -287,6 +292,10 @@ namespace Hector
                         CommandeInsert.CommandText = "UPDATE Marques SET Nom = '" + textBox1.Text + "' WHERE RefMarque = '" + MarqueAModifier.RefMarque + "'";
 
                         CommandeInsert.ExecuteNonQuery();
+
+                        MarqueAModifier.NomMarque = textBox1.Text;
+
+
                     }
 
                     if (TypeDePage == "Famille")
@@ -295,6 +304,9 @@ namespace Hector
                         // Modification de la famille dans la bdd
                         CommandeInsert.CommandText = "UPDATE Familles SET Nom = '" + textBox1.Text + "' WHERE RefFamille = '" + FamilleAModifier.RefFamille + "'";
                         CommandeInsert.ExecuteNonQuery();
+
+                        FamilleAModifier.NomFamille = textBox1.Text;
+
                     }
 
                     if (TypeDePage == "SousFamille")
@@ -304,6 +316,12 @@ namespace Hector
                         CommandeInsert.CommandText = "UPDATE SousFamilles SET Nom = '" + textBox1.Text + "', RefFamille = '" + ListeFamilles[ComboBoxFamille.SelectedIndex].RefFamille
                             + "' WHERE RefSousFamille = '" + SousFamilleAModifier.RefSousFamille + "'";
                         CommandeInsert.ExecuteNonQuery();
+
+                        // Modification de la sou-famille dans l'application
+                        CommandeRead.CommandText = "SELECT Nom FROM SousFamilles WHERE Nom = '" + textBox1.Text + "'";
+
+                        SousFamilleAModifier.NomSousFamille = textBox1.Text;
+
                     }
 
                     Con.Close();

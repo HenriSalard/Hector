@@ -25,7 +25,7 @@ namespace Hector
 
         
 
-        public int RefFamille { get; protected set; }
-        public string NomFamille { get; protected set; }
+        public int RefFamille { get; set; }
+        public string NomFamille { get; set; }
     }
 }

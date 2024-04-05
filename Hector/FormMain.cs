@@ -13,16 +13,19 @@ namespace Hector
     public partial class FormMain : Form
     {
 
-        List<Article> ListArticle;
+        List<Article> ListArticle; // La liste des articles
 
-        List<Famille> ListFamille;
+        List<Famille> ListFamille; // La liste des familles
 
-        List<SousFamille> ListSousFamille;
+        List<SousFamille> ListSousFamille; // La liste des sous-familles
 
-        List<Marque> ListMarque;
+        List<Marque> ListMarque; // La liste des marques
 
         private ListViewColumnSorter lvwColumnSorter;
 
+        /// <summary>
+        /// Charge toutes les listes grace aux méthodes dans FonctionsSQLite
+        /// </summary>
         public void LoadLists()
         {
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
@@ -42,12 +45,20 @@ namespace Hector
             Con.Close();
         }
 
+        /// <summary>
+        /// Instancie un objet de la classe FormMain
+        /// </summary>
         public FormMain()
         {
             InitializeComponent();
             this.Text = "Fenetre principale";
         }
 
+        /// <summary>
+        /// Gère l'événement de clic sur le menu "Importer" dans la barre de menus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Creation de la fenetre Importer
@@ -73,11 +84,11 @@ namespace Hector
 
         }
 
-        private void fichiersToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        /// <summary>
+        /// Gere le clic sur le bouton exporter: Lance la fenetre d'exportation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void exporterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FormExport Exportdialog = new FormExport();
@@ -97,6 +108,7 @@ namespace Hector
 
         }
 
+
         private void FormMain_Load(object sender, EventArgs e)
         {
 
@@ -108,6 +120,9 @@ namespace Hector
 
         }
 
+        /// <summary>
+        /// Gère le chargement du formulaire principal.
+        /// </summary>
         protected void RefreshTree()
         {
             
@@ -155,6 +170,9 @@ namespace Hector
             
         }
 
+        /// <summary>
+        /// Permet de cacher les colonnes quand on regarde la liste des familles ou marques
+        /// </summary>
         protected void HideColumns()
         {
             listView1.Columns[0].Width = 0;
@@ -165,6 +183,9 @@ namespace Hector
             listView1.Columns[6].Width = 0;
         }
 
+        /// <summary>
+        /// Permet de re-afficher les colonnes
+        /// </summary>
         protected void ShowColumns()
         {
             listView1.Columns[0].Width = -2;
@@ -177,10 +198,17 @@ namespace Hector
 
         }
 
+        /// <summary>
+        /// Rafraîchit la liste des articles affichée dans la listView1 en fonction de la catégorie spécifiée.
+        /// </summary>
+        /// <param name="Category">La catégorie des articles à afficher.</param>
+        /// <param name="Refnoeud">La référence de nœud à utiliser pour filtrer les articles (utilisée dans certains cas).</param>
         protected void RefreshListArticle(string Category, string Refnoeud)
-        {           
+        {
 
+            // Début de la mise à jour de la listView1 pour éviter le rafraîchissement pendant l'ajout d'éléments
             this.listView1.BeginUpdate();
+
 
             listView1.Items.Clear();
 
@@ -353,17 +381,15 @@ namespace Hector
 
         }
 
-        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
-        {
-
-            
-
-
-        }
-
+        /// <summary>
+        /// Événement déclenché après la sélection d'un nœud dans le treeView1.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
 
+            // On récupère le nœud sélectionné dans le treeView1
             TreeNode Node = treeView1.SelectedNode;
 
             if (Node.FullPath.Equals("Marques"))
@@ -396,6 +422,11 @@ namespace Hector
             
         }
 
+        /// <summary>
+        /// Gere le clic sur une colonne
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             // Determine if clicked column is already the column that is being sorted.
@@ -528,11 +559,19 @@ namespace Hector
 
         }
 
+        /// <summary>
+        /// Gere le clic sur un item du ToolStripMenu
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void actualiserToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AllRefresh();
         }
 
+        /// <summary>
+        /// Refresh toute la page. Fait appel à la base de données
+        /// </summary>
         private void AllRefresh()
         {
             LoadLists();
@@ -540,31 +579,42 @@ namespace Hector
             RefreshListArticle("NoeudArticle", null);
         }
 
+        /// <summary>
+        /// Gere l'appui sur les differentes touches du clavier
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormMain_KeyDown(object sender, KeyEventArgs e)
         {
+
+            // F refresh la page (comme actualiser)
             if(e.KeyCode == Keys.F5)
             {
                 AllRefresh();
             }
+
+            // La touche espace lance la modification de l'article selectionné (s'il y en a un sinon ne fait rien)
             if(e.KeyCode == Keys.Space || e.KeyCode == Keys.Enter)
             {
-                ListViewItem Item = listView1.SelectedItems[0];
 
-                FormAjouterModifierArticle ImportDialog =
-                            new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
-
-                // Affichage de la fenetre Importer
-
-
-                if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+                if (listView1.SelectedItems.Count > 0)
                 {
-                    // Suppression de la fenetre Importer
+                    ListViewItem Item = listView1.SelectedItems[0];
 
-                    this.RefreshTree();
+                    FormAjouterModifierArticle ImportDialog =
+                                new FormAjouterModifierArticle(false, ListFamille, ListSousFamille, ListMarque, ListArticle.Find(x => x.RefArticle == Item.Text));
 
-                    ImportDialog.Dispose();
+                    // Affichage de la fenetre Importer
 
+                    if (ImportDialog.ShowDialog(this) == DialogResult.OK)
+                    {
+                        // Suppression de la fenetre Importer
 
+                        this.RefreshTree();
+
+                        ImportDialog.Dispose();
+
+                    }
                 }
             }
             if(e.KeyCode == Keys.Delete)
@@ -574,7 +624,11 @@ namespace Hector
             }
         }
         
-
+        /// <summary>
+        /// Gere le double clic sur un element
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
             ListViewItem Item = listView1.SelectedItems[0];
@@ -595,6 +649,11 @@ namespace Hector
             }
         }
         
+        /// <summary>
+        /// Gere l'appuis sur la touche de modification
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void modifierToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListViewItem Item = listView1.SelectedItems[0];
@@ -614,9 +673,10 @@ namespace Hector
 
                     ListFamille.Add(FamMarqueDialog.GetFamille());
 
+                    // Suppression de la fenetre Importer
                     FamMarqueDialog.Dispose();
 
-                    // Suppression de la fenetre Importer
+
                     this.RefreshListArticle("NoeudFamille", null);
                 }
             }
@@ -673,15 +733,18 @@ namespace Hector
 
                     FamMarqueDialog.Dispose();
 
-                    this.RefreshTree();
-
                     // Suppression de la fenetre Importer
-                    this.RefreshListArticle("NoeudSousFamille", null);
+                    this.RefreshListArticle("NoeudFamille", null);
                 }
             }
 
         }
 
+        /// <summary>
+        /// Gere le clic sur le bouton d'ajout d'un element
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ajouterToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -757,6 +820,11 @@ namespace Hector
             
         }
 
+        /// <summary>
+        /// Gere le clic sur le bouton de suppression d'un element
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void supprimerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             const string message = "Etes vous sûr de supprimer cet ligne?\nCette action est irrévocable.";
@@ -794,6 +862,10 @@ namespace Hector
             }
         }
 
+        /// <summary>
+        /// Supprime une famille
+        /// </summary>
+        /// <param name="Famille">La famille a supprimer</param>
         private void Supprimer_Famille(Famille Famille)
         {
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
@@ -839,6 +911,10 @@ namespace Hector
             Con.Close();
         }
 
+        /// <summary>
+        /// Supprime une sous-famille
+        /// </summary>
+        /// <param name="SousFamille">La sous-famille à supprimer</param>
         private void Supprimer_SousFamille(SousFamille SousFamille)
         {
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
@@ -880,6 +956,10 @@ namespace Hector
             Con.Close();
         }
 
+        /// <summary>
+        /// Supprime une marque
+        /// </summary>
+        /// <param name="Marque">La marque à supprimer</param>
         private void Supprimer_Marque(Marque Marque)
         {
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
@@ -922,6 +1002,10 @@ namespace Hector
             
         }
 
+        /// <summary>
+        /// Supprime un article
+        /// </summary>
+        /// <param name="Article">L'article à modifier</param>
         private void Supprimer_Article(Article Article)
         {
             SQLiteConnection Con = new SQLiteConnection("URI=file:"
@@ -942,6 +1026,7 @@ namespace Hector
 
             this.RefreshListArticle("NoeudArticle", null);
         }
+
 
         private void listView1_MouseUp(object sender, MouseEventArgs e)
         {
@@ -965,10 +1050,16 @@ namespace Hector
                 contextMenuStrip1.Show(c, e.Location);
             }
         }
+
+        private void fichiersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+        }
     }
-
-    
-
 
 
 }
