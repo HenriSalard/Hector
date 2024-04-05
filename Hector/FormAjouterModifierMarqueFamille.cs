@@ -31,7 +31,17 @@ namespace Hector
         SousFamille SousFamilleAModifier;
 
 
-
+        /// <summary>
+        /// Constructeur de la pfenetre d'ajout/modification d'une marque/famille/sous famille
+        /// </summary>
+        /// <param name="Ajouter"> Bool : Dit si on c'est une fenetre d'ajout ou de modification</param>
+        /// <param name="Type"> String : "Marque" ou "Famille" ou "SousFamille" , donne le type d'element à modifier</param>
+        /// <param name="ListeFamilles"> La liste de toutes les familles </param>
+        /// <param name="ListeSousFamilles"> La liste de toutes les sous familles </param>
+        /// <param name="ListeMarques">La liste de toutes les marques</param>
+        /// <param name="MarqueAModifier">La marque a modifier, null par defaut</param>
+        /// <param name="FamilleAModifier">La famille a modifier, null par defaut</param>
+        /// <param name="SousFamilleAModifier">La sous famille a modifier, null par defaut</param>
         public FormAjouterModifierMarqueFamille(bool Ajouter, string Type, List<Famille> ListeFamilles, List<SousFamille> ListeSousFamilles, List<Marque> ListeMarques,
             Marque MarqueAModifier = null, Famille FamilleAModifier=null, SousFamille SousFamilleAModifier = null)
         {
