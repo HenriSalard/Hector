@@ -652,7 +652,7 @@ namespace Hector
             const string message = "Etes vous sûr de supprimer cet ligne?\nCette action est irrévocable.";
             const string caption = "Supprimer élément";
             var result = MessageBox.Show(message, caption,
-                                         MessageBoxButtons.OKCancel,
+                                         MessageBoxButtons.YesNo,
                                          MessageBoxIcon.Warning);
 
             
@@ -661,7 +661,29 @@ namespace Hector
                 // TODO Mettre code pour supprimer élément
 
 
+                ListViewItem Item = listView1.SelectedItems[0];
 
+                Article Article = ListArticle.Find(x => x.RefArticle == Item.Text);
+
+                SQLiteConnection Con = new SQLiteConnection("URI=file:"
+                + System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)
+                + "\\Hector.sqlite");
+
+                Con.Open();
+
+                SQLiteCommand CommandeInsert = new SQLiteCommand(string.Empty, Con);
+
+                CommandeInsert.CommandText = "DELETE FROM Articles WHERE RefArticle = '" + Article.RefArticle + "'";
+
+                CommandeInsert.ExecuteNonQuery();
+
+                Con.Close();
+
+                ListArticle.Remove(Article);
+
+                this.RefreshTree();
+
+                this.RefreshListArticle("NoeudArticle",null);
 
 
 
